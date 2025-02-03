@@ -1,33 +1,37 @@
-import { afterAll, describe, expect, jest, test,  } from "@jest/globals";
-import supertest from 'supertest';
+import { afterAll, beforeAll, describe, expect, jest, test,  } from "@jest/globals";
 import { signIn } from "../test_utils/test_user";
-
-const request = supertest('http://127.0.0.1:5001/dinner-ready-d541f/us-central1/createUser');
+import { TEST_FAMILY, TEST_USER } from "../test_utils/constants";
+import { SUCCESS_CODE } from "../../src/utils/status_codes";
+import { sendPostRequest } from "../test_utils/requests";
 
 describe("Registration unit tests", () => {
+    let token: string;
+
+    beforeAll(async () => {
+        token = await signIn();
+    });
+
     afterAll(() => {
         jest.clearAllMocks();
     });
 
-    test("Should create new user in Firestore", async () => {
+    test("Should save new user's details", async () => {
         const body = {
-            email: "testemail@example.com",
-            first_name: "Test",
-            surname: "Account"
+            email: TEST_USER.email,
+            first_name: TEST_USER.first_name,
+            surname: TEST_USER.surname
         };
-        const token = await signIn();
 
-        if (token === undefined) {
-            throw Error;
-        }
+        const response = await sendPostRequest("/createUser", body, token);
 
-        const response = await request
-            .post("/createUser")
-            .set("Authorization", token)
-            .send({
-                ...body
-            });
+        expect(response.status).toBe(SUCCESS_CODE);
+    });
 
-        expect(response.status).toBe(201);
+    test("Should save new family's details", async () => {
+        const body = TEST_FAMILY;
+
+        const response = await sendPostRequest("/createFamilyAccount", body, token);
+
+        expect(response.status).toBe(SUCCESS_CODE);
     });
 });
