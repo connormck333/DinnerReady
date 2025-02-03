@@ -9,10 +9,11 @@
     "sourceMap": true,
     "strict": true,
     "target": "es2017",
-    "types": ["jest"]
+    "types": ["jest"],
+    "resolveJsonModule": true
   },
   "compileOnSave": true,
   "include": [
     "src"
-  ]
+, "index.ts", "test/test_utils/admin.ts"  ]
 }

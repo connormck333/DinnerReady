@@ -1,11 +1,13 @@
 import { initializeApp } from 'firebase-admin/app';
-import { getAuth } from 'firebase-admin/auth';
+import { getAuth, Auth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 
-initializeApp();
+const app = initializeApp({
+    projectId: process.env.PROJECT_ID
+});
 
-const db = getFirestore();
-const auth = getAuth();
+const db = getFirestore(app);
+const auth: Auth = getAuth(app);
 
 export {
     db,
