@@ -2,15 +2,21 @@ import { DocumentReference, DocumentSnapshot, QuerySnapshot } from "firebase-adm
 import { db } from "../admin";
 import QueryStatus from "../../types/query_status";
 import { QueryResponse, User } from "../../types/interfaces";
+import { getUserData } from "./account";
 
 async function addUserToFamily(familyId: string, userId: string, admin: boolean): Promise<boolean> {
     const familiesRef: DocumentReference = db.collection("families").doc(familyId);
 
     try {
-        await familiesRef.collection("members").add({
+        await familiesRef.collection("members").doc(userId).set({
             email: userId,
             admin: admin
         });
+
+        await db.collection("users").doc(userId).set({
+            familyId: familyId,
+            admin: admin
+        }, { merge: true });
     } catch(error) {
         return false;
     }
@@ -31,7 +37,8 @@ async function getFamilyMembers(familyId: string, userId: string | undefined): P
                 email: memberUserSnap.data()?.email,
                 firstName: memberUserSnap.data()?.firstName,
                 surname: memberUserSnap.data()?.surname,
-                familyId: familyId
+                familyId: familyId,
+                admin: memberUserSnap.data()?.admin
             }
             members.push(memberData);
         }
@@ -42,7 +49,30 @@ async function getFamilyMembers(familyId: string, userId: string | undefined): P
     return {status: QueryStatus.SUCCESS, data: members};
 }
 
+async function updateUsersAdminStatus(userId: string, admin: boolean): Promise<boolean> {
+    try {
+        const queryResponse: QueryResponse = await getUserData(userId);
+        if (queryResponse.status === QueryStatus.FAILURE) return false;
+
+        const userData: User = queryResponse.data;
+        if (userData.familyId === undefined) return false;
+
+        await db.collection("users").doc(userId).set({
+            admin: admin
+        }, { merge: true });
+
+        await db.collection("families").doc(userData.familyId).collection("members").doc(userId).set({
+            admin: admin
+        }, { merge: true });
+
+        return true;
+    } catch(error) {
+        return false;
+    }
+}
+
 export {
     addUserToFamily,
-    getFamilyMembers
+    getFamilyMembers,
+    updateUsersAdminStatus
 }

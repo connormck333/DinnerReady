@@ -17,7 +17,8 @@ interface User {
     firstName: string,
     surname: string,
     familyId: string | undefined,
-    email: string | undefined
+    email: string | undefined,
+    admin: boolean | undefined
 }
 
 interface QueryResponse {

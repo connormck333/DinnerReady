@@ -58,7 +58,6 @@ const createFamilyAccount = onRequest(async (req: Request, res: Response) : Prom
     // Create new family doc
     const familiesRef: CollectionReference = db.collection("families");
     let familyDoc: DocumentReference;
-
     try {
         familyDoc = await familiesRef.add({
             name: body.family_name,
@@ -69,13 +68,16 @@ const createFamilyAccount = onRequest(async (req: Request, res: Response) : Prom
         return;
     }
 
+    // Add requesting user as admin
+    await addUserToFamily(familyDoc.id, userEmail, true);
+
     // Save family id to user
     const usersRef: CollectionReference = db.collection("users");
-
     try {
         await usersRef.doc(userEmail).set({
-            familyId: familyDoc.id
-        }, { merge: true })
+            familyId: familyDoc.id,
+            admin: true
+        }, { merge: true });
     } catch(error) {
         res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
         return;

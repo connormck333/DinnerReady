@@ -10,7 +10,8 @@ async function getUserData(userId: string): Promise<QueryResponse> {
             firstName: snapshot.data()?.firstName,
             surname: snapshot.data()?.surname,
             email: userId,
-            familyId: snapshot.data()?.familyId
+            familyId: snapshot.data()?.familyId,
+            admin: snapshot.data()?.admin
         }
         return { status: QueryStatus.SUCCESS, data: userData };
     } catch(error) {
@@ -18,6 +19,16 @@ async function getUserData(userId: string): Promise<QueryResponse> {
     }
 }
 
+async function isUserAdmin(userId: string): Promise<QueryResponse> {
+    const queryResponse = await getUserData(userId);
+    if (queryResponse.status === QueryStatus.FAILURE) return { status: QueryStatus.FAILURE, data: false };
+
+    const userData: User = queryResponse.data;
+
+    return { status: QueryStatus.SUCCESS, data: userData.admin };
+}
+
 export {
-    getUserData
+    getUserData,
+    isUserAdmin
 }
