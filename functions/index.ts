@@ -1,4 +1,4 @@
-import { getUserInfo } from "./src/triggers/account";
+import { getUserInfo, removeAdminStatusFromFamilyMember, setUserAsFamilyAdmin } from "./src/triggers/account";
 import { createUser, createFamilyAccount, joinFamilyAccountAsAdmin, joinFamilyAccountAsMember } from "./src/triggers/registration";
 
 module.exports = {
@@ -6,5 +6,7 @@ module.exports = {
     createFamilyAccount,
     joinFamilyAccountAsAdmin,
     joinFamilyAccountAsMember,
-    getUserInfo
+    getUserInfo,
+    setUserAsFamilyAdmin,
+    removeAdminStatusFromFamilyMember
 };

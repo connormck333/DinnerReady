@@ -101,7 +101,41 @@ const setUserAsFamilyAdmin = onRequest(async (req: Request, res: Response): Prom
     res.status(SUCCESS_CODE).send(SUCCESS_MESSAGE);
 });
 
+const removeAdminStatusFromFamilyMember = onRequest(async (req: Request, res: Response): Promise<void> => {
+
+    if (!isPutReq(req.method)) {
+        res.status(INVALID_REQUEST_CODE).send(INVALID_REQUEST_MESSAGE);
+        return;
+    }
+
+    const body: any = req.body;
+    const token: string | undefined = req.headers.authorization;
+    const userEmail: string = body.email.toLowerCase();
+    if (!(await authenticateUserToken(token, userEmail))) {
+        res.status(UNAUTHORISED_CODE).send(UNAUTHORISED_MESSAGE);
+        return;
+    }
+
+    // Check user sending request is an admin
+    if (!(await isUserAdmin(userEmail))) {
+        res.status(UNAUTHORISED_CODE).send(UNAUTHORISED_MESSAGE);
+        return;
+    }
+
+    // Update new user to admin
+    const adminEmail: string = body.adminEmail;
+    const success: boolean = await updateUsersAdminStatus(adminEmail, false);
+
+    if (!success) {
+        res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
+        return;
+    }
+
+    res.status(SUCCESS_CODE).send(SUCCESS_MESSAGE);
+});
+
 export {
     getUserInfo,
-    setUserAsFamilyAdmin
+    setUserAsFamilyAdmin,
+    removeAdminStatusFromFamilyMember
 }
