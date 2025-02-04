@@ -1,6 +1,8 @@
-import { createUser, createFamilyAccount } from "./src/triggers/registration";
+import { createUser, createFamilyAccount, joinFamilyAccountAsAdmin, joinFamilyAccountAsMember } from "./src/triggers/registration";
 
 module.exports = {
     createUser,
-    createFamilyAccount
+    createFamilyAccount,
+    joinFamilyAccountAsAdmin,
+    joinFamilyAccountAsMember
 };
