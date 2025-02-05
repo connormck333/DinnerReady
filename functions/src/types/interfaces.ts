@@ -26,9 +26,30 @@ interface QueryResponse {
     data: any
 }
 
+interface Dinner {
+    dinnerId: string | undefined,
+    announcedAtTimestamp: number,
+    startsAtTimestamp: number,
+    endsAtTimestamp: number,
+    description: string
+}
+
+interface DinnerStatus {
+    dinner: Dinner,
+    attendance: User[]
+}
+
+interface Attendee {
+    user: User,
+    attending: boolean
+}
+
 export {
     User,
     Family,
     UserFamily,
-    QueryResponse
+    QueryResponse,
+    Dinner,
+    DinnerStatus,
+    Attendee
 }

@@ -28,7 +28,18 @@ async function isUserAdmin(userId: string): Promise<QueryResponse> {
     return { status: QueryStatus.SUCCESS, data: userData.admin };
 }
 
+async function getFamilyId(userId: string): Promise<QueryResponse> {
+    const userDataResponse: QueryResponse = await getUserData(userId);
+    const userData: User = userDataResponse.data;
+    if (userDataResponse.status === QueryStatus.FAILURE || userData.familyId === undefined) {
+        return { status: QueryStatus.FAILURE, data: null };
+    }
+
+    return { status: QueryStatus.SUCCESS, data: userData.familyId }
+}
+
 export {
     getUserData,
-    isUserAdmin
+    isUserAdmin,
+    getFamilyId
 }
