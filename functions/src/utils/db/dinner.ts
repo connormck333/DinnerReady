@@ -1,5 +1,5 @@
-import { CollectionReference, DocumentReference, DocumentSnapshot } from "firebase-admin/firestore";
-import { Attendee, Dinner, QueryResponse, User } from "../../types/interfaces";
+import { CollectionReference, DocumentReference, DocumentSnapshot, QuerySnapshot } from "firebase-admin/firestore";
+import { Attendee, Dinner, DinnerStatus, QueryResponse, User } from "../../types/interfaces";
 import { db } from "../admin";
 import QueryStatus from "../../types/query_status";
 import { getFamilyMembers } from "./families";
@@ -15,7 +15,8 @@ async function createNewDinner(familyId: string, dinnerData: Dinner): Promise<Qu
             announcedAtTimestamp: dinnerData.announcedAtTimestamp,
             startsAtTimestamp: dinnerData.startsAtTimestamp,
             endsAtTimestamp: dinnerData.endsAtTimestamp,
-            description: dinnerData.description
+            description: dinnerData.description,
+            date: dinnerData.date
         });
 
         const dinner: Dinner = {
@@ -24,7 +25,7 @@ async function createNewDinner(familyId: string, dinnerData: Dinner): Promise<Qu
         }
 
         return { status: QueryStatus.SUCCESS, data: dinner };
-    } catch(error) {
+    } catch (error) {
         return { status: QueryStatus.FAILURE, data: null };
     }
 }
@@ -44,9 +45,10 @@ async function getDinner(familyId: string, dinnerId: string): Promise<QueryRespo
             announcedAtTimestamp: data.data()?.announcedAtTimestamp,
             startsAtTimestamp: data.data()?.startsAtTimestamp,
             endsAtTimestamp: data.data()?.endsAtTimestamp,
-            description: data.data()?.description
+            description: data.data()?.description,
+            date: data.data()?.date
         }
-    } catch(error) {
+    } catch (error) {
         return { status: QueryStatus.FAILURE, data: null };
     }
 
@@ -66,14 +68,19 @@ async function getDinner(familyId: string, dinnerId: string): Promise<QueryRespo
                 attending: attendingStatus
             });
         }
-    } catch(error) {
+    } catch (error) {
         return { status: QueryStatus.FAILURE, data: null };
     }
 
-    return { status: QueryStatus.SUCCESS, data: attendees };
+    const dinnerStatus: DinnerStatus = {
+        attendance: attendees,
+        dinner: dinnerData
+    }
+
+    return { status: QueryStatus.SUCCESS, data: dinnerStatus };
 }
 
-async function setAttendanceForDinner(userId: string, familyId: string, dinnerId: string, attendingStatus: boolean): Promise<boolean> {
+async function setAttendanceForDinnerWithId(userId: string, familyId: string, dinnerId: string, attendingStatus: boolean): Promise<boolean> {
     const ref: DocumentReference = db
         .collection("families")
         .doc(familyId)
@@ -85,11 +92,32 @@ async function setAttendanceForDinner(userId: string, familyId: string, dinnerId
             email: userId,
             attending: attendingStatus
         });
-    } catch(error) {
+    } catch (error) {
         return false;
     }
 
     return true;
+}
+
+async function setAttendanceForDinnerWithoutId(userId: string, familyId: string, attendingStatus: boolean, date: string): Promise<boolean> {
+    const ref: CollectionReference = db
+        .collection("families")
+        .doc(familyId)
+        .collection("dinners");
+
+    try {
+        // Create new dinner with date
+        const doc: DocumentReference = await ref.add({
+            date: date
+        });
+
+        // Set attendance
+        const success: boolean = await setAttendanceForDinnerWithId(userId, familyId, doc.id, attendingStatus);
+
+        return success;
+    } catch (error) {
+        return false;
+    }
 }
 
 async function getAttendanceForDinner(userId: string, familyId: string, dinnerId: string): Promise<boolean> {
@@ -102,13 +130,35 @@ async function getAttendanceForDinner(userId: string, familyId: string, dinnerId
     try {
         const doc: DocumentSnapshot = await ref.collection("responses").doc(userId).get();
         return doc.data()?.attending;
-    } catch(error) {
+    } catch (error) {
         return false;
+    }
+}
+
+async function doesDinnerExist(userId: string, familyId: string, date: string): Promise<QueryResponse> {
+    const ref: CollectionReference = db
+        .collection("families")
+        .doc(familyId)
+        .collection("dinners")
+
+    try {
+        const response: QuerySnapshot = await ref.where("date", "==", date).get();
+        return {
+            status: QueryStatus.SUCCESS,
+            data: {
+                exists: response.docs.length > 0,
+                dinnerId: response.docs.length > 0 ? response.docs[0].id : null
+            }
+        };
+    } catch (error) {
+        return { status: QueryStatus.FAILURE, data: null };
     }
 }
 
 export {
     createNewDinner,
-    setAttendanceForDinner,
-    getDinner
+    setAttendanceForDinnerWithId,
+    setAttendanceForDinnerWithoutId,
+    getDinner,
+    doesDinnerExist
 }

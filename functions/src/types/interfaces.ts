@@ -31,12 +31,13 @@ interface Dinner {
     announcedAtTimestamp: number,
     startsAtTimestamp: number,
     endsAtTimestamp: number,
-    description: string
+    description: string,
+    date: string
 }
 
 interface DinnerStatus {
     dinner: Dinner,
-    attendance: User[]
+    attendance: Attendee[]
 }
 
 interface Attendee {

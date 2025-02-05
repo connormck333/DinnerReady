@@ -5,7 +5,7 @@ import { GENERAL_ERROR_CODE, GENERAL_ERROR_MESSAGE, INVALID_REQUEST_CODE, INVALI
 import { authenticateUserToken } from "../utils/authorisation";
 import { getFamilyId, getUserData, isUserAdmin } from "../utils/db/account";
 import { Attendee, Dinner, QueryResponse, User } from "../types/interfaces";
-import { createNewDinner, getDinner, setAttendanceForDinner } from "../utils/db/dinner";
+import { createNewDinner, doesDinnerExist, getDinner, setAttendanceForDinnerWithId, setAttendanceForDinnerWithoutId } from "../utils/db/dinner";
 import QueryStatus from "../types/query_status";
 
 const startDinner = onRequest(async (req: Request, res: Response): Promise<void> => {
@@ -38,12 +38,27 @@ const startDinner = onRequest(async (req: Request, res: Response): Promise<void>
     
     const dinnerData: Dinner = {
         dinnerId: undefined,
+        date: body.date,
         announcedAtTimestamp: Date.now(),
         startsAtTimestamp: body.startsAtTimestamp,
         endsAtTimestamp: body.endsAtTimestamp,
         description: body.description
     }
-    const queryResponse: QueryResponse = await createNewDinner(userData.familyId, dinnerData);
+
+    const dinnerExistsResponse: QueryResponse = await doesDinnerExist(userEmail, userData.familyId, body.date);
+    if (dinnerExistsResponse.status == QueryStatus.FAILURE) {
+        res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
+        return;
+    }
+    const dinnerExists: boolean = dinnerExistsResponse.data.exists;
+
+    let queryResponse: QueryResponse;
+    if (dinnerExists) {
+        queryResponse = await getDinner(userData.familyId, dinnerExistsResponse.data.dinnerId);
+    } else {
+        queryResponse = await createNewDinner(userData.familyId, dinnerData);
+    }
+
     if (queryResponse.status === QueryStatus.FAILURE) {
         res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
         return;
@@ -51,7 +66,7 @@ const startDinner = onRequest(async (req: Request, res: Response): Promise<void>
 
     // Send notifications
 
-    res.status(SUCCESS_CODE).send(JSON.stringify(dinnerData));
+    res.status(SUCCESS_CODE).send(JSON.stringify(queryResponse.data));
 });
 
 const getDinnerDetails = onRequest(async (req: Request, res: Response): Promise<void> => {
@@ -142,10 +157,24 @@ async function registerAttendanceForDinner(userEmail: string, body: any, attendi
     if (familyIdResponse.status === QueryStatus.FAILURE) return false;
 
     const familyId: string = familyIdResponse.data.familyId;
-    const dinnerId: string = body.dinnerId;
-    
-    const success: boolean = await setAttendanceForDinner(userEmail, familyId, dinnerId, attendingStatus);
+    const dinnerId: string | null = body?.dinnerId;
+    const date: string = body?.date;
 
+    // Check if dinnerId exists
+    const response: QueryResponse = await doesDinnerExist(userEmail, familyId, date);
+    if (response.status == QueryStatus.FAILURE) {
+        return false;
+    }
+
+    const dinnerExists: boolean = response.data.exists;
+
+    let success: boolean;
+    if (dinnerId === null || !dinnerExists) {
+        success = await setAttendanceForDinnerWithoutId(userEmail, familyId, attendingStatus, date);
+    } else {
+        success = await setAttendanceForDinnerWithId(userEmail, familyId, dinnerId, attendingStatus);
+    }
+    
     return success;
 }
 
