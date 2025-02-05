@@ -5,7 +5,7 @@ import { GENERAL_ERROR_CODE, GENERAL_ERROR_MESSAGE, INVALID_REQUEST_CODE, INVALI
 import { authenticateUserToken } from "../utils/authorisation";
 import { DocumentReference, DocumentSnapshot } from "firebase-admin/firestore";
 import { db } from "../utils/admin";
-import { Family, QueryResponse, QueryResponseExists, UserFamily } from "../types/interfaces";
+import { Family, QueryResponse, QueryResponseExists, User, UserFamily } from "../types/interfaces";
 import QueryStatus from "../types/query_status";
 import { getFamilyMembers, updateUsersAdminStatus } from "../utils/db/families";
 import { getUserData, isUserAdmin } from "../utils/db/account";
@@ -36,7 +36,7 @@ const getUserInfo = onRequest(async (req: Request, res: Response): Promise<void>
         res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
         return;
     }
-    const userData = userQueryResponse.data;
+    const userData: User = userQueryResponse.data;
     const familyId: string | undefined = userData?.familyId;
 
     // Get family data
@@ -70,7 +70,8 @@ const getUserInfo = onRequest(async (req: Request, res: Response): Promise<void>
         firstName: userData.firstName,
         surname: userData.surname,
         email: userEmail,
-        familyData: familyData
+        familyData: familyData,
+        admin: userData.admin
     }
 
     res.status(SUCCESS_CODE).json(data);

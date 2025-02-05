@@ -8,13 +8,18 @@ import { GetParam } from '../test_utils/interfaces';
 describe("Account unit tests", () => {
     const TEST_ACCOUNT: any = {
         email: "accountTest@testing.com",
-        password: "testingpwd12345"
+        password: "testingpwd12345",
+        firstName: "Test",
+        surname: "Account"
     }
     const ADMIN_ACCOUNT: any = {
         email: "adminTest@testing.com",
-        password: "testingpwd12345"
+        password: "testingpwd12345",
+        firstName: "Admin",
+        surname: "Account"
     }
     let token: string;
+    let familyId: string;
 
     beforeAll(async () => {
         token = await signIn(TEST_ACCOUNT.email, TEST_ACCOUNT.password);
@@ -27,8 +32,8 @@ describe("Account unit tests", () => {
     test("Should get user info without joining family", async () => {
         const userInfo: any = {
             email: TEST_ACCOUNT.email,
-            firstName: "Test",
-            surname: "Account"
+            firstName: TEST_ACCOUNT.firstName,
+            surname: TEST_ACCOUNT.surname
         }
 
         const userCreateResponse: Response = await sendPostRequest("/createUser", userInfo, token);
@@ -60,16 +65,17 @@ describe("Account unit tests", () => {
         // Create new user
         const adminInfo: any = {
             email: ADMIN_ACCOUNT.email,
-            firstName: "Admin",
-            surname: "Account"
+            firstName: ADMIN_ACCOUNT.firstName,
+            surname: ADMIN_ACCOUNT.surname
         }
         const userCreateResponse: Response = await sendPostRequest("/createUser", adminInfo, adminToken);
         expect(userCreateResponse.status).toBe(SUCCESS_CODE);
 
         // Join family
+        familyId = familyResponse.body.familyId;
         const adminFamilyInfo: any = {
             email: ADMIN_ACCOUNT.email,
-            familyId: familyResponse.body.familyId
+            familyId: familyId
         }
         const memberResponse: Response = await sendPostRequest("/joinFamilyAccountAsMember", adminFamilyInfo, adminToken);
         expect(memberResponse.status).toBe(SUCCESS_CODE);
@@ -81,5 +87,31 @@ describe("Account unit tests", () => {
         }
         const response: Response = await sendPutRequest("/setUserAsFamilyAdmin", body, token);
         expect(response.status).toBe(SUCCESS_CODE);
+    });
+
+    test("Should get user & family members info after joining family", async () => {
+        const userInfo: any = {
+            email: TEST_ACCOUNT.email,
+            firstName: TEST_ACCOUNT.firstName,
+            surname: TEST_ACCOUNT.surname,
+            admin: true,
+            familyId: familyId
+        }
+
+        const param: GetParam = {
+            key: "email",
+            value: userInfo.email
+        }
+        const response = await sendGetRequest("/getUserInfo", [param], token);
+
+        expect(response.status).toBe(SUCCESS_CODE);
+        expect(response.body).toHaveProperty("firstName", userInfo.firstName);
+        expect(response.body).toHaveProperty("surname", userInfo.surname);
+        expect(response.body).toHaveProperty("admin", userInfo.admin);
+        expect(response.body.familyData).toHaveProperty("familyId", userInfo.familyId);
+
+        expect(response.body.familyData.members[0]).toHaveProperty("firstName", ADMIN_ACCOUNT.firstName);
+        expect(response.body.familyData.members[0]).toHaveProperty("surname", ADMIN_ACCOUNT.surname);
+        expect(response.body.familyData.members[0]).toHaveProperty("admin", true);
     });
 });

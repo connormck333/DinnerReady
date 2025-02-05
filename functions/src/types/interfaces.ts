@@ -4,6 +4,7 @@ interface UserFamily {
     firstName: string,
     surname: string,
     email: string | undefined,
+    admin: boolean | undefined,
     familyData: Family | undefined
 }
 
