@@ -145,7 +145,7 @@ const removeAdminStatusFromFamilyMember = onRequest(async (req: Request, res: Re
     }
 
     // Update new user to admin
-    const adminEmail: string = body.adminEmail;
+    const adminEmail: string = body.adminEmail.toLowerCase();
     const familyId: string = userResponse.data?.familyId;
     const success: boolean = await updateUsersAdminStatus(adminEmail, familyId, false);
 

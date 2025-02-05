@@ -114,4 +114,13 @@ describe("Account unit tests", () => {
         expect(response.body.familyData.members[0]).toHaveProperty("surname", ADMIN_ACCOUNT.surname);
         expect(response.body.familyData.members[0]).toHaveProperty("admin", true);
     });
+
+    test("Should remove admin status from user", async () => {
+        const body: any = {
+            email: TEST_ACCOUNT.email,
+            adminEmail: ADMIN_ACCOUNT.email
+        }
+        const response: Response = await sendPutRequest("/removeAdminStatusFromFamilyMember", body, token);
+        expect(response.status).toBe(SUCCESS_CODE);
+    });
 });
