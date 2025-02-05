@@ -26,6 +26,12 @@ interface QueryResponse {
     data: any
 }
 
+interface QueryResponseExists {
+    status: QueryStatus,
+    data: any,
+    exists: boolean
+}
+
 interface Dinner {
     dinnerId: string | undefined,
     announcedAtTimestamp: number,
@@ -50,6 +56,7 @@ export {
     Family,
     UserFamily,
     QueryResponse,
+    QueryResponseExists,
     Dinner,
     DinnerStatus,
     Attendee

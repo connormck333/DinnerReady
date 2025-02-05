@@ -1,12 +1,13 @@
 import { onRequest, Request } from "firebase-functions/v2/https";
 import { Response } from "express";
-import { db } from "../utils/admin";
 import { isPostReq } from "../utils/request_utils";
 import { authenticateUserToken } from "../utils/authorisation";
-import { CollectionReference, DocumentReference } from "firebase-admin/firestore";
 import { GENERAL_ERROR_CODE, GENERAL_ERROR_MESSAGE, INVALID_REQUEST_CODE, INVALID_REQUEST_MESSAGE,
     SUCCESS_CODE, SUCCESS_MESSAGE, UNAUTHORISED_CODE, UNAUTHORISED_MESSAGE } from "../utils/status_codes";
-import { addUserToFamily } from "../utils/db/families";
+import { addUserToFamily, createNewFamily } from "../utils/db/families";
+import { createNewUser } from "../utils/db/account";
+import { QueryResponse } from "../types/interfaces";
+import QueryStatus from "../types/query_status";
 
 const createUser = onRequest(async (req: Request, res: Response) : Promise<void> => {
 
@@ -23,16 +24,8 @@ const createUser = onRequest(async (req: Request, res: Response) : Promise<void>
         return;
     }
 
-    // Create new user
-    const ref: CollectionReference = db.collection("users");
-
-    try {
-        await ref.doc(userEmail).set({
-            email: userEmail,
-            firstName: body.first_name,
-            surname: body.surname
-        });
-    } catch (error) {
+    const response: boolean = await createNewUser(userEmail, body.firstName, body.surname);
+    if (!response) {
         res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
         return;
     }
@@ -55,35 +48,13 @@ const createFamilyAccount = onRequest(async (req: Request, res: Response) : Prom
         return;
     }
 
-    // Create new family doc
-    const familiesRef: CollectionReference = db.collection("families");
-    let familyDoc: DocumentReference;
-    try {
-        familyDoc = await familiesRef.add({
-            name: body.family_name,
-            creator: body.email
-        });
-    } catch(error) {
+    const response: QueryResponse = await createNewFamily(userEmail, body.familyName);
+    if (response.status === QueryStatus.FAILURE) {
         res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
         return;
     }
 
-    // Add requesting user as admin
-    await addUserToFamily(familyDoc.id, userEmail, true);
-
-    // Save family id to user
-    const usersRef: CollectionReference = db.collection("users");
-    try {
-        await usersRef.doc(userEmail).set({
-            familyId: familyDoc.id,
-            admin: true
-        }, { merge: true });
-    } catch(error) {
-        res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
-        return;
-    }
-
-    res.status(SUCCESS_CODE).send(SUCCESS_MESSAGE);
+    res.status(SUCCESS_CODE).send(JSON.stringify({familyId: response.data}));
 });
 
 const joinFamilyAccountAsAdmin = onRequest(async (req: Request, res: Response) : Promise<void> => {

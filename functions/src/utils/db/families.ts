@@ -1,8 +1,41 @@
-import { DocumentReference, DocumentSnapshot, QuerySnapshot } from "firebase-admin/firestore";
+import { CollectionReference, DocumentReference, DocumentSnapshot, QuerySnapshot } from "firebase-admin/firestore";
 import { db } from "../admin";
 import QueryStatus from "../../types/query_status";
-import { QueryResponse, User } from "../../types/interfaces";
+import { QueryResponse, QueryResponseExists, User } from "../../types/interfaces";
 import { getUserData } from "./account";
+
+async function createNewFamily(userEmail: string, familyName: string): Promise<QueryResponse> {
+
+    // Check user exists and does not already belong to a family
+    const userData: QueryResponseExists = await getUserData(userEmail);
+    if (userData.status === QueryStatus.FAILURE || !userData.exists || userData.data?.familyId) {
+        return { status: QueryStatus.FAILURE, data: null };
+    }
+
+    const familiesRef: CollectionReference = db.collection("families");
+
+    try {
+        // Create new family doc
+        const familyDoc: DocumentReference = await familiesRef.add({
+            name: familyName,
+            creator: userEmail
+        });
+
+        // Add requesting user as admin
+        await addUserToFamily(familyDoc.id, userEmail, true);
+
+        // Save family Id to user
+        const usersRef: CollectionReference = db.collection("users");
+        await usersRef.doc(userEmail).set({
+            familyId: familyDoc.id,
+            admin: true
+        }, { merge: true });
+
+        return { status: QueryStatus.SUCCESS, data: familyDoc.id };
+    } catch(error) {
+        return { status: QueryStatus.FAILURE, data: null };
+    }
+}
 
 async function addUserToFamily(familyId: string, userId: string, admin: boolean): Promise<boolean> {
     const familiesRef: DocumentReference = db.collection("families").doc(familyId);
@@ -74,5 +107,6 @@ async function updateUsersAdminStatus(userId: string, admin: boolean): Promise<b
 export {
     addUserToFamily,
     getFamilyMembers,
-    updateUsersAdminStatus
+    updateUsersAdminStatus,
+    createNewFamily
 }
