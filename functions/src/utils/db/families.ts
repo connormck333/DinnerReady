@@ -32,15 +32,14 @@ async function createNewFamily(userEmail: string, familyName: string): Promise<Q
         }, { merge: true });
 
         return { status: QueryStatus.SUCCESS, data: familyDoc.id };
-    } catch(error) {
+    } catch (error) {
         return { status: QueryStatus.FAILURE, data: null };
     }
 }
 
 async function addUserToFamily(familyId: string, userId: string, admin: boolean): Promise<boolean> {
-    const familiesRef: DocumentReference = db.collection("families").doc(familyId);
-
     try {
+        const familiesRef: DocumentReference = db.collection("families").doc(familyId);
         await familiesRef.collection("members").doc(userId).set({
             email: userId,
             admin: admin
@@ -50,7 +49,7 @@ async function addUserToFamily(familyId: string, userId: string, admin: boolean)
             familyId: familyId,
             admin: admin
         }, { merge: true });
-    } catch(error) {
+    } catch (error) {
         return false;
     }
 
@@ -75,20 +74,20 @@ async function getFamilyMembers(familyId: string, userId: string | undefined): P
             }
             members.push(memberData);
         }
-    } catch(error) {
+    } catch (error) {
         return {status: QueryStatus.FAILURE, data: []};
     }
 
     return {status: QueryStatus.SUCCESS, data: members};
 }
 
-async function updateUsersAdminStatus(userId: string, admin: boolean): Promise<boolean> {
+async function updateUsersAdminStatus(userId: string, familyId: string, admin: boolean): Promise<boolean> {
     try {
-        const queryResponse: QueryResponse = await getUserData(userId);
-        if (queryResponse.status === QueryStatus.FAILURE) return false;
+        const queryResponse: QueryResponseExists = await getUserData(userId);
+        if (queryResponse.status === QueryStatus.FAILURE || !queryResponse.exists) return false;
 
         const userData: User = queryResponse.data;
-        if (userData.familyId === undefined) return false;
+        if (!userData.familyId || userData.familyId.toLowerCase() !== familyId.toLowerCase()) return false;
 
         await db.collection("users").doc(userId).set({
             admin: admin
@@ -99,7 +98,7 @@ async function updateUsersAdminStatus(userId: string, admin: boolean): Promise<b
         }, { merge: true });
 
         return true;
-    } catch(error) {
+    } catch (error) {
         return false;
     }
 }

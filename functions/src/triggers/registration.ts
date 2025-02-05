@@ -54,7 +54,7 @@ const createFamilyAccount = onRequest(async (req: Request, res: Response) : Prom
         return;
     }
 
-    res.status(SUCCESS_CODE).send(JSON.stringify({familyId: response.data}));
+    res.status(SUCCESS_CODE).json({familyId: response.data});
 });
 
 const joinFamilyAccountAsAdmin = onRequest(async (req: Request, res: Response) : Promise<void> => {
@@ -73,7 +73,7 @@ const joinFamilyAccountAsAdmin = onRequest(async (req: Request, res: Response) :
     }
 
     const familyId: string = body.familyId;
-    const success = addUserToFamily(familyId, userEmail, true);
+    const success = await addUserToFamily(familyId, userEmail, true);
 
     if (!success) {
         res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
@@ -99,7 +99,7 @@ const joinFamilyAccountAsMember = onRequest(async (req: Request, res: Response) 
     }
 
     const familyId: string = body.familyId;
-    const success = addUserToFamily(familyId, userEmail, false);
+    const success = await addUserToFamily(familyId, userEmail, false);
 
     if (!success) {
         res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);

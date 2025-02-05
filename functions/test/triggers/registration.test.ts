@@ -1,5 +1,5 @@
 import { Response } from 'supertest';
-import { afterAll, beforeAll, describe, expect, jest, test,  } from "@jest/globals";
+import { afterAll, beforeAll, describe, expect, jest, test } from "@jest/globals";
 import { signIn } from "../test_utils/test_user";
 import { TEST_FAMILY, TEST_USER } from "../test_utils/constants";
 import { GENERAL_ERROR_CODE, SUCCESS_CODE, UNAUTHORISED_CODE } from "../../src/utils/status_codes";
@@ -57,7 +57,7 @@ describe("Registration unit tests", () => {
         const body: any = TEST_FAMILY;
 
         const response: Response = await sendPostRequest("/createFamilyAccount", body, token);
-        familyId = response.body;
+        familyId = response.body.familyId;
         
         expect(response.status).toBe(SUCCESS_CODE);
     });

@@ -4,7 +4,7 @@ interface UserFamily {
     firstName: string,
     surname: string,
     email: string | undefined,
-    familyData: Family
+    familyData: Family | undefined
 }
 
 interface Family {
