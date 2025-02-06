@@ -103,9 +103,23 @@ async function updateUsersAdminStatus(userId: string, familyId: string, admin: b
     }
 }
 
+async function getFamilyCreator(familyId: string): Promise<QueryResponseExists> {
+    try {
+        const snapshot: DocumentSnapshot = await db.collection("families").doc(familyId).get();
+        if (!snapshot.exists) {
+            return { status: QueryStatus.SUCCESS, exists: false, data: null };
+        }
+
+        return { status: QueryStatus.SUCCESS, exists: true, data: snapshot.data()?.creator };
+    } catch (error) {
+        return { status: QueryStatus.FAILURE, exists: false, data: null };
+    }
+}
+
 export {
     addUserToFamily,
     getFamilyMembers,
     updateUsersAdminStatus,
-    createNewFamily
+    createNewFamily,
+    getFamilyCreator
 }

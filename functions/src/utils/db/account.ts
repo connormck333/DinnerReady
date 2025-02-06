@@ -2,6 +2,7 @@ import { CollectionReference, DocumentSnapshot } from "firebase-admin/firestore"
 import { QueryResponse, QueryResponseExists, User } from "../../types/interfaces";
 import { db } from "../admin";
 import QueryStatus from "../../types/query_status";
+import { getFamilyCreator } from "./families";
 
 async function createNewUser(userEmail: string, firstName: string, surname: string): Promise<boolean> {
 
@@ -44,12 +45,35 @@ async function getUserData(userId: string): Promise<QueryResponseExists> {
 }
 
 async function isUserAdmin(userId: string): Promise<QueryResponse> {
-    const queryResponse = await getUserData(userId);
-    if (queryResponse.status === QueryStatus.FAILURE) return { status: QueryStatus.FAILURE, data: false };
+    const queryResponse: QueryResponseExists = await getUserData(userId);
+    if (queryResponse.status === QueryStatus.FAILURE || !queryResponse.exists) {
+        return { status: QueryStatus.FAILURE, data: false };
+    }
 
     const userData: User = queryResponse.data;
 
     return { status: QueryStatus.SUCCESS, data: userData.admin };
+}
+
+async function isUserCreator(userId: string): Promise<QueryResponse> {
+    const queryResponse: QueryResponseExists = await getUserData(userId);
+    if (queryResponse.status === QueryStatus.FAILURE || !queryResponse.exists) {
+        return { status: QueryStatus.FAILURE, data: false };
+    }
+
+    const userData: User = queryResponse.data;
+    const familyId: string = userData.familyId as string;
+
+    if (!familyId) {
+        return { status: QueryStatus.SUCCESS, data: false };
+    }
+
+    const creatorResponse: QueryResponseExists = await getFamilyCreator(familyId);
+    if (creatorResponse.status === QueryStatus.FAILURE || !creatorResponse.exists) {
+        return { status: QueryStatus.FAILURE, data: false };
+    }
+
+    return { status: QueryStatus.SUCCESS, data: creatorResponse.data.toLowerCase() === userId.toLowerCase() };
 }
 
 async function getFamilyId(userId: string): Promise<QueryResponse> {
@@ -66,5 +90,6 @@ export {
     createNewUser,
     getUserData,
     isUserAdmin,
+    isUserCreator,
     getFamilyId
 }

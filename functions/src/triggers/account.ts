@@ -8,7 +8,7 @@ import { db } from "../utils/admin";
 import { Family, QueryResponse, QueryResponseExists, User, UserFamily } from "../types/interfaces";
 import QueryStatus from "../types/query_status";
 import { getFamilyMembers, updateUsersAdminStatus } from "../utils/db/families";
-import { getUserData, isUserAdmin } from "../utils/db/account";
+import { getUserData, isUserAdmin, isUserCreator } from "../utils/db/account";
 
 const getUserInfo = onRequest(async (req: Request, res: Response): Promise<void> => {
 
@@ -133,7 +133,7 @@ const removeAdminStatusFromFamilyMember = onRequest(async (req: Request, res: Re
     }
 
     // Check user sending request is an admin
-    if (!(await isUserAdmin(userEmail))) {
+    if (!(await isUserCreator(userEmail))) {
         res.status(UNAUTHORISED_CODE).send(UNAUTHORISED_MESSAGE);
         return;
     }
