@@ -1,14 +1,17 @@
-import { View, StyleSheet, Image } from "react-native";
+import { View, StyleSheet, Image, ScrollView } from "react-native";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 import GreenOverlay from "../components/GreenOverlay";
 import HeaderButton from "../components/buttons/HeaderButton";
 import StartButton from "../components/buttons/StartButton";
-import InfoBox from "../components/InfoBox";
+import ResponseBox from "../components/boxes/ResponseBox";
 
 export default function HomeScreen() {
     return (
-        <View style={styles.container}>
+        <ScrollView
+            style={styles.container}
+            contentContainerStyle={{paddingBottom: 100}}
+        >
             <GreenOverlay>
                 <View style={styles.header}>
                     <HeaderButton icon={<MaterialCommunityIcons name="account" size={24} color="black" />} />
@@ -23,9 +26,9 @@ export default function HomeScreen() {
             </GreenOverlay>
 
             <View style={styles.infoContainer}>
-
+                <ResponseBox />
             </View>
-        </View>
+        </ScrollView>
     );
 }
 
@@ -54,6 +57,6 @@ const styles = StyleSheet.create({
     infoContainer: {
         width: '100%',
         padding: 20,
-        paddingTop: 50
+        paddingTop: 60
     }
 });
