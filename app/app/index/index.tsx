@@ -1,4 +1,5 @@
 import { View, StyleSheet, Image, ScrollView } from "react-native";
+import { Href, useRouter, Router } from "expo-router";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 import GreenOverlay from "../../components/GreenOverlay";
@@ -7,6 +8,13 @@ import StartButton from "../../components/buttons/StartButton";
 import ResponseBox from "../../components/boxes/ResponseBox";
 
 export default function HomeScreen() {
+
+    const router: Router = useRouter();
+
+    function openAccountScreen(): void {
+        router.push("/account" as Href);
+    }
+
     return (
         <ScrollView
             style={styles.container}
@@ -14,7 +22,10 @@ export default function HomeScreen() {
         >
             <GreenOverlay>
                 <View style={styles.header}>
-                    <HeaderButton icon={<MaterialCommunityIcons name="account" size={24} color="black" />} />
+                    <HeaderButton
+                        onPress={openAccountScreen}
+                        icon={<MaterialCommunityIcons name="account-multiple" size={24} color="black" />}
+                    />
                     <Image
                         source={require("../../assets/images/Logo.png")}
                         style={styles.logo}

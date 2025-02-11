@@ -2,7 +2,10 @@ import { View, StyleSheet, TouchableOpacity } from "react-native";
 
 export default function HeaderButton(props: any) {
     return (
-        <TouchableOpacity style={styles.container}>
+        <TouchableOpacity
+            onPress={props.onPress}
+            style={styles.container}
+        >
             { props.icon }
         </TouchableOpacity>
     );

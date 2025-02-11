@@ -9,6 +9,13 @@ export default function HomeStack() {
             }}
         >
             <Stack.Screen name="index" />
+            <Stack.Screen
+                name="account"
+                options={{
+                    presentation: "transparentModal",
+                    animation: "none"
+                }}
+            />
         </Stack>
     );
 }
