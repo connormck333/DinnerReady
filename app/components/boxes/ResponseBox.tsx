@@ -1,8 +1,6 @@
-import { View, StyleSheet, Image, Text, Dimensions } from "react-native";
+import { View, StyleSheet, Image, Text } from "react-native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import InfoBox from "./InfoBox";
-
-const { width } = Dimensions.get("window");
 
 export default function ResponseBox(props: any) {
 

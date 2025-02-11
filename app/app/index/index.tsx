@@ -1,10 +1,10 @@
 import { View, StyleSheet, Image, ScrollView } from "react-native";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
-import GreenOverlay from "../components/GreenOverlay";
-import HeaderButton from "../components/buttons/HeaderButton";
-import StartButton from "../components/buttons/StartButton";
-import ResponseBox from "../components/boxes/ResponseBox";
+import GreenOverlay from "../../components/GreenOverlay";
+import HeaderButton from "../../components/buttons/HeaderButton";
+import StartButton from "../../components/buttons/StartButton";
+import ResponseBox from "../../components/boxes/ResponseBox";
 
 export default function HomeScreen() {
     return (
