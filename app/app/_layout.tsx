@@ -14,10 +14,17 @@ export default function TabLayout() {
             }}
         >
             <Tabs.Screen
-                name="index"
+                name='index'
                 options={{
                     title: 'Home',
-                    tabBarIcon: ({ color }) => <MaterialCommunityIcons name="silverware-fork-knife" size={30} color={color} />,
+                    tabBarIcon: ({ color }) => <MaterialCommunityIcons name="silverware-fork-knife" size={30} color={color} />
+                }}
+            />
+            <Tabs.Screen
+                name='calendar'
+                options={{
+                    title: 'Calendar',
+                    tabBarIcon: ({ color }) => <MaterialCommunityIcons name="calendar" size={30} color={color} />
                 }}
             />
         </Tabs>
@@ -36,8 +43,8 @@ const styles = StyleSheet.create({
         elevation: 3,
         shadowColor: '#000',
         shadowOffset: { height: 4, width: 0 },
-        shadowOpacity: 0.14,
-        shadowRadius: 8
+        shadowOpacity: 0.3,
+        shadowRadius: 10
     },
     tabBarLabel: {
         fontSize: 14,

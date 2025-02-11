@@ -6,8 +6,9 @@ import GreenOverlay from "../../components/GreenOverlay";
 import HeaderButton from "../../components/buttons/HeaderButton";
 import StartButton from "../../components/buttons/StartButton";
 import ResponseBox from "../../components/boxes/ResponseBox";
+import { ReactElement } from "react";
 
-export default function HomeScreen() {
+export default function HomeScreen(): ReactElement {
 
     const router: Router = useRouter();
 

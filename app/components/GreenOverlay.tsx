@@ -3,7 +3,9 @@ import { View, StyleSheet } from "react-native";
 export default function GreenOverlay(props: any) {
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, props.style, {
+            height: props.height ? props.height : 400
+        }]}>
             { props.children }
         </View>
     );
@@ -11,7 +13,6 @@ export default function GreenOverlay(props: any) {
 
 const styles = StyleSheet.create({
     container: {
-        height: 400,
         width: '100%',
         backgroundColor: '#1bb100',
         elevation: 3,

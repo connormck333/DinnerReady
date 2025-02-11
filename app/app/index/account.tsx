@@ -2,12 +2,13 @@ import { useLayoutEffect, ReactElement } from "react";
 import { View, StyleSheet, Text, Dimensions, Image, FlatList, TouchableOpacity } from "react-native";
 import HeaderButton from "@/components/buttons/HeaderButton";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter, Router } from "expo-router";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, SharedValue, StyleProps, Easing, runOnJS } from "react-native-reanimated";
 
 const { height } = Dimensions.get("window");
 
-export default function AccountScreen() {
+export default function AccountScreen(): ReactElement {
 
     const router: Router = useRouter();
     const translateY: SharedValue<number> = useSharedValue(-height);
@@ -84,9 +85,11 @@ function Footer(props: any): ReactElement {
     return (
         <View style={styles.footer}>
             <TouchableOpacity style={[styles.btn, styles.inviteBtn, styles.center]}>
-                <Text style={styles.btnText}>Send an invite</Text>
+                <MaterialIcons name="mail" size={24} color="#fff" />
+                <Text style={styles.btnText}>Invite</Text>
             </TouchableOpacity>
             <TouchableOpacity style={[styles.btn, styles.manageBtn, styles.center]}>
+                <MaterialIcons name="settings" size={24} color="#fff" />
                 <Text style={styles.btnText}>Settings</Text>
             </TouchableOpacity>
         </View>
@@ -156,7 +159,9 @@ const styles = StyleSheet.create({
         shadowOffset: { height: 4, width: 0 },
         shadowOpacity: 0.1,
         shadowRadius: 5,
-        borderWidth: 2
+        borderWidth: 2,
+        flexDirection: 'row',
+        alignItems: 'center'
     },
     inviteBtn: {
         backgroundColor: '#005C00',
@@ -170,7 +175,8 @@ const styles = StyleSheet.create({
     btnText: {
         fontSize: 20,
         color: '#ebebeb',
-        fontWeight: '500'
+        fontWeight: '500',
+        marginLeft: 5
     },
     center: {
         alignItems: 'center',
