@@ -11,7 +11,7 @@ const { width } = Dimensions.get("window");
 
 export default function TabLayout(): ReactElement {
 
-    const [signedIn, setSignedIn] = useState(true);
+    const [signedIn, setSignedIn] = useState(false);
 
     if (signedIn) {
         return <TabNavigator />
