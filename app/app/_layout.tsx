@@ -1,33 +1,51 @@
+import { ReactElement, useState } from "react";
 import { StyleSheet, Dimensions } from "react-native";
-import { Tabs } from "expo-router";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import RegistrationStack from "./registration/navigator";
+import HomeStack from "./home/navigator";
+import CalendarStack from "./calendar/navigator";
 
+const Tab = createBottomTabNavigator();
 const { width } = Dimensions.get("window");
 
-export default function TabLayout() {
+export default function TabLayout(): ReactElement {
+
+    const [signedIn, setSignedIn] = useState(true);
+
+    if (signedIn) {
+        return <TabNavigator />
+    }
+
+    return <RegistrationStack />
+}
+
+function TabNavigator(): ReactElement {
     return (
-        <Tabs
+        <Tab.Navigator
             screenOptions={{
                 tabBarStyle: styles.tabBar,
                 tabBarLabelStyle: styles.tabBarLabel,
                 headerShown: false
             }}
         >
-            <Tabs.Screen
+            <Tab.Screen
                 name='index'
+                component={HomeStack}
                 options={{
                     title: 'Home',
                     tabBarIcon: ({ color }) => <MaterialCommunityIcons name="silverware-fork-knife" size={30} color={color} />
                 }}
             />
-            <Tabs.Screen
+            <Tab.Screen
                 name='calendar'
+                component={CalendarStack}
                 options={{
                     title: 'Calendar',
                     tabBarIcon: ({ color }) => <MaterialCommunityIcons name="calendar" size={30} color={color} />
                 }}
             />
-        </Tabs>
+        </Tab.Navigator>
     );
 }
 
