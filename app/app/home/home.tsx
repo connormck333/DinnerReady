@@ -1,5 +1,4 @@
 import { View, StyleSheet, Image, ScrollView } from "react-native";
-import { Href, useRouter, Router } from "expo-router";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 import GreenOverlay from "../../components/GreenOverlay";
@@ -8,12 +7,12 @@ import StartButton from "../../components/buttons/StartButton";
 import ResponseBox from "../../components/boxes/ResponseBox";
 import { ReactElement } from "react";
 
-export default function HomeScreen(): ReactElement {
+export default function HomeScreen(props: any): ReactElement {
 
-    const router: Router = useRouter();
+    const { navigation } = props;
 
     function openAccountScreen(): void {
-        router.push("/account" as Href);
+        navigation.navigate("account");
     }
 
     return (
@@ -28,7 +27,7 @@ export default function HomeScreen(): ReactElement {
                         icon={<MaterialCommunityIcons name="account-multiple" size={24} color="black" />}
                     />
                     <Image
-                        source={require("../../assets/images/Logo.png")}
+                        source={require("@/assets/images/Logo.png")}
                         style={styles.logo}
                         resizeMode="contain"
                     />

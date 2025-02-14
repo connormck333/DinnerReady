@@ -2,8 +2,13 @@ import { ReactElement } from "react";
 import { View, StyleSheet, Image, TouchableOpacity, Text } from "react-native";
 import LinearBackground from "@/components/LinearBackground";
 
+export default function WelcomeScreen(props: any): ReactElement {
 
-export default function WelcomeScreen(): ReactElement {
+    const { navigation } = props;
+
+    function goToLoginScreen(): void {
+        navigation.navigate("login");
+    }
 
     return (
         <LinearBackground
@@ -34,6 +39,7 @@ export default function WelcomeScreen(): ReactElement {
 
                 <TouchableOpacity
                     style={[styles.loginBtn, styles.marginTopSmall]}
+                    onPress={goToLoginScreen}
                 >
                     <Text style={styles.loginBtnText}>Login</Text>
                 </TouchableOpacity>

@@ -1,19 +1,45 @@
-import LinearBackground from '@/components/LinearBackground';
-import { ReactElement } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { ReactElement, useState } from 'react';
+import { View, StyleSheet, Dimensions } from 'react-native';
+import Input from '@/components/form/Input';
+import RegistrationHeader from '@/components/registration/RegistrationHeader';
+import RegistrationForm from '@/components/registration/RegistrationForm';
 
 export default function LoginScreen(): ReactElement {
 
-    return (
-        <LinearBackground style={styles.center}>
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
-        </LinearBackground>
+    function login(): void {
+        
+    }
+
+    return (
+        <View style={styles.container}>
+            <RegistrationHeader />
+
+            <RegistrationForm
+                button={true}
+                buttonText="Login"
+            >
+                <Input
+                    input={[email, setEmail]}
+                    label="Email"
+                />
+
+                <Input
+                    input={[password, setPassword]}
+                    label="Password"
+                    marginTop={true}
+                />
+            </RegistrationForm>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
-    center: {
+    container: {
+        flex: 1,
         alignItems: 'center',
-        justifyContent: 'center'
+        backgroundColor: '#e9ffe5'
     }
 });
