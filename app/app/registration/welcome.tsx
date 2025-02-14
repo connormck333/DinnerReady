@@ -10,6 +10,10 @@ export default function WelcomeScreen(props: any): ReactElement {
         navigation.navigate("login");
     }
 
+    function goToCreateAccountScreen(): void {
+        navigation.navigate("createAccount");
+    }
+
     return (
         <LinearBackground
             style={styles.center}
@@ -26,22 +30,17 @@ export default function WelcomeScreen(props: any): ReactElement {
             <View style={[styles.marginTopLarge, styles.center, styles.fullWidth]}>
 
                 <TouchableOpacity
+                    onPress={goToCreateAccountScreen}
                     style={[styles.btn, styles.createBtn, styles.center]}
                 >
-                    <Text style={styles.btnText}>Create family account</Text>
+                    <Text style={styles.btnText}>Create Account</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
+                    onPress={goToLoginScreen}
                     style={[styles.btn, styles.joinBtn, styles.center, styles.marginTopSmall]}
                 >
-                    <Text style={[styles.btnText, styles.textDark]}>Join family account</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                    style={[styles.loginBtn, styles.marginTopSmall]}
-                    onPress={goToLoginScreen}
-                >
-                    <Text style={styles.loginBtnText}>Login</Text>
+                    <Text style={[styles.btnText, styles.textDark]}>Login</Text>
                 </TouchableOpacity>
 
             </View>

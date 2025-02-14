@@ -5,6 +5,7 @@ export default function SubmitButton(props: any): ReactElement {
 
     return (
         <TouchableOpacity
+            onPress={() => props.onPress()}
             style={[styles.container, {
                 marginTop: props.marginTop ? 40 : 0
             }]}

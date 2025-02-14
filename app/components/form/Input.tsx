@@ -1,19 +1,16 @@
 import { ReactElement, useState } from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
+import Label from './Label';
 
 export default function Input(props: any): ReactElement {
 
     const [input, setInput] = props.input;
 
     return (
-        <View style={styles.container}>
-            <Text
-                style={[styles.label, styles.shadow, {
-                    marginTop: props.marginTop ? 20 : 0
-                }]}
-            >
-                { props.label }
-            </Text>
+        <View style={[styles.container, props.containerStyle, {
+            marginTop: props.marginTop ? 20 : props.containerStyle?.marginTop
+        }]}>
+            <Label label={props.label} />
             <TextInput
                 value={input}
                 onChangeText={setInput}
@@ -27,11 +24,6 @@ export default function Input(props: any): ReactElement {
 const styles = StyleSheet.create({
     container: {
         width: '100%'
-    },
-    label: {
-        marginLeft: 5,
-        fontSize: 18,
-        fontWeight: '500'
     },
     input: {
         width: '100%',

@@ -1,8 +1,8 @@
 import { ReactElement, useState } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import Input from '@/components/form/Input';
 import RegistrationHeader from '@/components/registration/RegistrationHeader';
-import RegistrationForm from '@/components/registration/RegistrationForm';
+import Form from '@/components/form/Form';
 
 export default function LoginScreen(): ReactElement {
 
@@ -17,7 +17,8 @@ export default function LoginScreen(): ReactElement {
         <View style={styles.container}>
             <RegistrationHeader />
 
-            <RegistrationForm
+            <Form
+                style={{marginTop: 30}}
                 button={true}
                 buttonText="Login"
             >
@@ -31,7 +32,7 @@ export default function LoginScreen(): ReactElement {
                     label="Password"
                     marginTop={true}
                 />
-            </RegistrationForm>
+            </Form>
         </View>
     );
 }
