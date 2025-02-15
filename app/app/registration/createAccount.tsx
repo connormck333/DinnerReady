@@ -3,6 +3,8 @@ import { View, StyleSheet } from 'react-native';
 import RegistrationHeader from '@/components/registration/RegistrationHeader';
 import Input from '@/components/form/Input';
 import Form from '@/components/form/Form';
+import { Status } from '@/methods/utils/interfaces';
+import createNewUser from '@/methods/registration/createUser';
 
 export default function CreateAccountScreen(props: any): ReactElement {
 
@@ -17,6 +19,17 @@ export default function CreateAccountScreen(props: any): ReactElement {
         navigation.navigate("createFamily");
     }
 
+    async function createAccount(): Promise<void> {
+        const response: Status = await createNewUser({
+            email: email,
+            password: password,
+            firstName: forename,
+            lastName: surname
+        });
+
+        console.log(response);
+    }
+
     return (
         <View style={styles.container}>
             <RegistrationHeader />
@@ -25,7 +38,7 @@ export default function CreateAccountScreen(props: any): ReactElement {
                 style={{marginTop: 30}}
                 button={true}
                 buttonText="Create Account"
-                onPress={goToCreateFamilyScreen}
+                onPress={createAccount}
             >
 
                 <Input

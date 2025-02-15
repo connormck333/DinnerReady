@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end'
     },
     logo: {
-        width: 200,
+        width: 130,
         height: 100
     },
     calendarContainer: {

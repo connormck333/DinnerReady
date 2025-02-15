@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row'
     },
     logo: {
-        width: 200,
+        width: 130,
         height: 100
     },
     invis: {
