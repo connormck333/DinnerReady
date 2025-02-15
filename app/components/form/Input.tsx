@@ -1,5 +1,5 @@
-import { ReactElement, useState } from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { ReactElement } from 'react';
+import { View, TextInput, StyleSheet } from 'react-native';
 import Label from './Label';
 
 export default function Input(props: any): ReactElement {
@@ -16,6 +16,10 @@ export default function Input(props: any): ReactElement {
                 onChangeText={setInput}
                 placeholder={props.placeholder}
                 style={[styles.input, styles.shadow]}
+                textContentType={props.type}
+                secureTextEntry={props.type === "password"}
+                autoComplete={props.autoComplete}
+                autoCapitalize={props.type === "emailAddress" || props.type === "password" ? "none" : "sentences"}
             />
         </View>
     );

@@ -4,7 +4,7 @@ import HeaderButton from "../buttons/HeaderButton";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useNavigation } from "@react-navigation/native";
 
-export default function RegistrationHeader(): ReactElement {
+export default function RegistrationHeader(props: any): ReactElement {
 
     const navigation = useNavigation();
 
@@ -14,11 +14,15 @@ export default function RegistrationHeader(): ReactElement {
 
     return (
         <View style={styles.container}>
-            <HeaderButton
-                icon={<MaterialCommunityIcons name="chevron-left" size={24} color="black" />}
-                color="rgba(22, 141, 0, 0.3)"
-                onPress={goBack}
-            />
+            { props.headerButton === false ?
+                <View style={styles.invis} />
+                :
+                <HeaderButton
+                    icon={<MaterialCommunityIcons name="chevron-left" size={24} color="black" />}
+                    color="rgba(22, 141, 0, 0.3)"
+                    onPress={goBack}
+                />
+            }
             <Image
                 source={require("../../assets/images/Logo.png")}
                 style={styles.logo}

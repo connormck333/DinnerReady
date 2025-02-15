@@ -16,7 +16,8 @@ async function createNewUser(userEmail: string, firstName: string, surname: stri
         await ref.doc(userEmail).set({
             email: userEmail,
             firstName: firstName,
-            surname: surname
+            surname: surname,
+            hasCompletedOnboarding: false
         });
     } catch (error) {
         return false;
@@ -36,7 +37,8 @@ async function getUserData(userId: string): Promise<QueryResponseExists> {
             surname: snapshot.data()?.surname,
             email: userId,
             familyId: snapshot.data()?.familyId,
-            admin: snapshot.data()?.admin
+            admin: snapshot.data()?.admin,
+            hasCompletedOnboarding: snapshot.data()?.hasCompletedOnboarding
         }
         return { status: QueryStatus.SUCCESS, data: userData, exists: true };
     } catch(error) {

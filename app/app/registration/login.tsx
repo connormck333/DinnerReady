@@ -3,14 +3,15 @@ import { View, StyleSheet } from 'react-native';
 import Input from '@/components/form/Input';
 import RegistrationHeader from '@/components/registration/RegistrationHeader';
 import Form from '@/components/form/Form';
+import { userLogin } from '@/methods/userManagement/login';
 
 export default function LoginScreen(): ReactElement {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    function login(): void {
-        
+    async function login(): Promise<void> {
+        await userLogin(email, password);
     }
 
     return (
@@ -21,16 +22,21 @@ export default function LoginScreen(): ReactElement {
                 style={{marginTop: 30}}
                 button={true}
                 buttonText="Login"
+                onPress={login}
             >
                 <Input
                     input={[email, setEmail]}
                     label="Email"
+                    type="emailAddress"
+                    autoComplete="email"
                 />
 
                 <Input
                     input={[password, setPassword]}
                     label="Password"
                     marginTop={true}
+                    type="password"
+                    autoComplete="current-password"
                 />
             </Form>
         </View>

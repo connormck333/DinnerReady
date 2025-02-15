@@ -1,8 +1,18 @@
+import { Dispatch, SetStateAction } from "react"
+
 interface NewUser {
     email: string,
     firstName: string,
     lastName: string,
     password: string
+}
+
+interface User {
+    email: string,
+    firstName: string,
+    lastName: string,
+    familyId: string | undefined,
+    hasCompletedOnboarding: boolean
 }
 
 interface Status {
@@ -19,9 +29,13 @@ interface LowerContainerRef {
     closeScreen: () => void;
 }
 
+type UserContextType = [User, Dispatch<SetStateAction<User>>];
+
 export {
     NewUser,
     Status,
     GetParam,
-    LowerContainerRef
+    LowerContainerRef,
+    User,
+    UserContextType
 }

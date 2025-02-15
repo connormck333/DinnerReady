@@ -5,6 +5,7 @@ interface UserFamily {
     surname: string,
     email: string | undefined,
     admin: boolean | undefined,
+    hasCompletedOnboarding?: boolean,
     familyData: Family | undefined
 }
 
@@ -19,7 +20,8 @@ interface User {
     surname: string,
     familyId: string | undefined,
     email: string | undefined,
-    admin: boolean | undefined
+    admin: boolean | undefined,
+    hasCompletedOnboarding?: boolean
 }
 
 interface QueryResponse {

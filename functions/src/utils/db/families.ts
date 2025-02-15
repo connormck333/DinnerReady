@@ -28,7 +28,8 @@ async function createNewFamily(userEmail: string, familyName: string): Promise<Q
         const usersRef: CollectionReference = db.collection("users");
         await usersRef.doc(userEmail).set({
             familyId: familyDoc.id,
-            admin: true
+            admin: true,
+            hasCompletedOnboarding: true
         }, { merge: true });
 
         return { status: QueryStatus.SUCCESS, data: familyDoc.id };

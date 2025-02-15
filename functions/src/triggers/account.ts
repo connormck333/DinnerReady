@@ -71,7 +71,8 @@ const getUserInfo = onRequest(async (req: Request, res: Response): Promise<void>
         surname: userData.surname,
         email: userEmail,
         familyData: familyData,
-        admin: userData.admin
+        admin: userData.admin,
+        hasCompletedOnboarding: userQueryResponse.data.hasCompletedOnboarding
     }
 
     res.status(SUCCESS_CODE).json(data);

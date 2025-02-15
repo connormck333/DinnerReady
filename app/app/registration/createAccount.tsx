@@ -1,10 +1,11 @@
 import { ReactElement, useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Alert } from 'react-native';
 import RegistrationHeader from '@/components/registration/RegistrationHeader';
 import Input from '@/components/form/Input';
 import Form from '@/components/form/Form';
 import { Status } from '@/methods/utils/interfaces';
 import createNewUser from '@/methods/registration/createUser';
+import { isValidName, isValidPassword } from '@/methods/utils/inputValidation';
 
 export default function CreateAccountScreen(props: any): ReactElement {
 
@@ -15,11 +16,20 @@ export default function CreateAccountScreen(props: any): ReactElement {
     const [password, setPassword] = useState("");
     const [passwordConfirm, setPasswordConfirm] = useState("");
 
-    function goToCreateFamilyScreen(): void {
-        navigation.navigate("createFamily");
-    }
-
     async function createAccount(): Promise<void> {
+        if (password !== passwordConfirm) {
+            Alert.alert("Invalid Password", "Your passwords do not match!");
+            return;
+        }
+
+        if (!isValidName(forename) || !isValidName(surname)) {
+            Alert.alert("Invalid Name", "Your name must be between 2 and 25 characters long");
+            return;
+        } else if (!isValidPassword(password)) {
+            Alert.alert("Invalid Password", "Your password must be longer than 7 characters and contain a special character");
+            return;
+        }
+
         const response: Status = await createNewUser({
             email: email,
             password: password,
@@ -27,7 +37,11 @@ export default function CreateAccountScreen(props: any): ReactElement {
             lastName: surname
         });
 
-        console.log(response);
+        if (!response.success) {
+            Alert.alert("Error", "There was an error creating your account. Please try again later.");
+        } else {
+            navigation.navigate("avatar", {email: email.toLowerCase()});
+        }
     }
 
     return (
@@ -56,6 +70,8 @@ export default function CreateAccountScreen(props: any): ReactElement {
                     input={[email, setEmail]}
                     label="Email"
                     marginTop
+                    type="emailAddress"
+                    autoComplete="email"
                 />
 
                 <Input
@@ -63,6 +79,7 @@ export default function CreateAccountScreen(props: any): ReactElement {
                     label="Password"
                     placeholder="***********"
                     marginTop
+                    type="password"
                 />
 
                 <Input
@@ -70,6 +87,7 @@ export default function CreateAccountScreen(props: any): ReactElement {
                     label="Confirm Password"
                     placeholder="***********"
                     marginTop
+                    type="password"
                 />
 
             </Form>

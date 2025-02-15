@@ -7,8 +7,9 @@ import HomeStack from "./home/navigator";
 import CalendarStack from "./calendar/navigator";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/methods/firebase";
-import { Status } from "@/methods/utils/interfaces";
+import { Status, User, UserContextType } from "@/methods/utils/interfaces";
 import { getUserDetails } from "@/methods/userManagement/getUserDetails";
+import UserContext from "@/methods/context/userContext";
 
 const Tab = createBottomTabNavigator();
 const { width } = Dimensions.get("window");
@@ -16,33 +17,49 @@ const { width } = Dimensions.get("window");
 export default function TabLayout(): ReactElement {
 
     const [signedIn, setSignedIn] = useState<boolean | undefined>(undefined);
-    const [signedInUser, setSignedInUser] = useState<any>(undefined);
+    const [signedInUser, setSignedInUser] = useState<User | undefined>(undefined);
 
     useEffect(() => {
         (() => {
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     const authToken = await user.getIdToken();
-                    const userDetails: Status = await getUserDetails(user.email as string, authToken);
+                    const response: Status = await getUserDetails(user.email as string, authToken);
         
-                    if (userDetails.success) {
-                        setSignedInUser(userDetails.response);
+                    if (response.success) {
+                        const userDetails: User = response.response;
+                        setSignedInUser(userDetails);
                         setSignedIn(true);
                         return;
                     }
                 }
                 setSignedIn(false);
-            }, () => setSignedIn(false));
+                setSignedInUser(undefined);
+            }, () => {
+                setSignedIn(false);
+                setSignedInUser(undefined);
+            });
         })();
     }, []);
 
-    if (signedIn === undefined) {
-        return <View />
-    } else if (!signedIn) {
-        return <RegistrationStack />
-    }
-
-    return <TabNavigator />
+    return (
+        <UserContext.Provider value={[signedInUser, setSignedInUser] as UserContextType}>
+            { signedIn === undefined ?
+                <View />
+                :
+                <>
+                    {!signedIn || (signedIn && !signedInUser?.hasCompletedOnboarding) ?
+                        <RegistrationStack
+                            signedIn={signedIn}
+                            hasCompletedOnboarding={signedInUser?.hasCompletedOnboarding}
+                        />
+                        :
+                        <TabNavigator />
+                    }
+                </>
+            }
+        </UserContext.Provider>
+    );
 }
 
 function TabNavigator(): ReactElement {

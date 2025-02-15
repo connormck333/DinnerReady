@@ -21,6 +21,7 @@ export default function Form(props: any): ReactElement {
                     props.secondButton &&
                     <SecondaryButton
                         text={props.secondButtonText}
+                        onPress={props.secondButtonOnPress}
                         containerStyle={{marginTop: 25}}
                     />
                 }
