@@ -10,7 +10,18 @@ interface Status {
     response: any
 }
 
+interface GetParam {
+    key: string
+    value: string
+}
+
+interface LowerContainerRef {
+    closeScreen: () => void;
+}
+
 export {
     NewUser,
-    Status
+    Status,
+    GetParam,
+    LowerContainerRef
 }

@@ -1,5 +1,6 @@
 import { View, StyleSheet, Image, ScrollView } from "react-native";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
 import GreenOverlay from "../../components/GreenOverlay";
 import HeaderButton from "../../components/buttons/HeaderButton";
@@ -13,6 +14,10 @@ export default function HomeScreen(props: any): ReactElement {
 
     function openAccountScreen(): void {
         navigation.navigate("account");
+    }
+
+    function openSettingsScreen(): void {
+        navigation.navigate("settings");
     }
 
     return (
@@ -31,7 +36,10 @@ export default function HomeScreen(props: any): ReactElement {
                         style={styles.logo}
                         resizeMode="contain"
                     />
-                    <HeaderButton />
+                    <HeaderButton
+                        onPress={openSettingsScreen}
+                        icon={<MaterialIcons name="settings" size={24} color="black" />}
+                    />
                 </View>
                 <StartButton containerStyle={styles.startButtonContainer} />
             </GreenOverlay>

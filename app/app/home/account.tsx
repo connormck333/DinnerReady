@@ -1,84 +1,48 @@
-import { useLayoutEffect, ReactElement } from "react";
-import { View, StyleSheet, Text, Dimensions, Image, FlatList, TouchableOpacity } from "react-native";
-import HeaderButton from "@/components/buttons/HeaderButton";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { ReactElement, useRef } from "react";
+import { View, StyleSheet, Text, Dimensions, Image, FlatList, TouchableOpacity, Animated } from "react-native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useRouter, Router } from "expo-router";
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, SharedValue, StyleProps, Easing, runOnJS } from "react-native-reanimated";
+import LoweringContainer from "@/components/animations/LoweringContainer";
+import { LowerContainerRef } from "@/methods/utils/interfaces";
+import SharedHeader from "@/components/SharedHeader";
 
 const { height } = Dimensions.get("window");
 
 export default function AccountScreen(): ReactElement {
 
-    const router: Router = useRouter();
-    const translateY: SharedValue<number> = useSharedValue(-height);
-
-    useLayoutEffect(() => {
-        (() => {
-            translateY.value = withTiming(0, {
-                duration: 500,
-                easing: Easing.out(Easing.ease)
-            });
-        })();
-    }, []);
-
-    const animatedStyle: StyleProps = useAnimatedStyle(() => ({
-        transform: [{ translateY: translateY.value }],
-    }));
-
-    function startCloseAnimation(): void {
-        translateY.value = withTiming(-height, {
-            duration: 500,
-            easing: Easing.out(Easing.ease)
-        }, () => {
-            runOnJS(router.back)();
-        });
-    }
+    const loweringContainerRef = useRef<LowerContainerRef>(null);
 
     function closeModal(): void {
-        startCloseAnimation();
+        loweringContainerRef.current?.closeScreen();
     }
 
     return (
-        <Animated.View style={[styles.container, animatedStyle]}>
-            <FlatList
-                data={[1,2,3,4]}
-                numColumns={2}
-                style={styles.list}
-                ListHeaderComponent={<Header closeModal={closeModal} />}
-                renderItem={({ item, index }) => (
-                    <View style={[styles.item, {
-                        marginTop: index > 1 ? 20 : 0
-                    }]}>
-                        <Image
-                            source={{ uri: "https://preview.redd.it/looking-for-opponents-for-marge-simpson-the-simpsons-for-a-v0-vcvx5mj6mypa1.jpg?width=1080&crop=smart&auto=webp&s=d7fd5a47b79f23e32f5941a3a685366a42c9bdf5" }}
-                            style={styles.avatar}
-                            resizeMode="cover"
-                        />
-                        <Text style={styles.nameText}>Marge</Text>
-                    </View>
-                )}
-                ListFooterComponent={<Footer />}
-            />
+        <Animated.View>
+            <LoweringContainer
+                ref={loweringContainerRef}
+                style={styles.container}
+            >
+                <FlatList
+                    data={[1,2,3,4]}
+                    numColumns={2}
+                    style={styles.list}
+                    ListHeaderComponent={<SharedHeader goBack={closeModal} />}
+                    renderItem={({ item, index }) => (
+                        <View style={[styles.item, {
+                            marginTop: index > 1 ? 20 : 0
+                        }]}>
+                            <Image
+                                source={{ uri: "https://preview.redd.it/looking-for-opponents-for-marge-simpson-the-simpsons-for-a-v0-vcvx5mj6mypa1.jpg?width=1080&crop=smart&auto=webp&s=d7fd5a47b79f23e32f5941a3a685366a42c9bdf5" }}
+                                style={styles.avatar}
+                                resizeMode="cover"
+                            />
+                            <Text style={styles.nameText}>Marge</Text>
+                        </View>
+                    )}
+                    ListFooterComponent={<Footer />}
+                />
+            </LoweringContainer>
         </Animated.View>
     );
-}
-
-function Header(props: any): ReactElement {
-    return (
-        <View style={styles.header}>
-            <HeaderButton
-                onPress={props.closeModal}
-                icon={<MaterialCommunityIcons name="window-close" size={24} color="black" />}
-            />
-            <Image
-                source={require("../../assets/images/Logo.png")}
-                style={styles.logo}
-                resizeMode="contain"
-            />
-            <View style={styles.invis} />
-        </View>
-    )
 }
 
 function Footer(props: any): ReactElement {
@@ -108,23 +72,6 @@ const styles = StyleSheet.create({
         shadowOffset: { height: 4, width: 0 },
         shadowOpacity: 0.4,
         shadowRadius: 10
-    },
-    header: {
-        width: '100%',
-        paddingTop: 40,
-        paddingHorizontal: 30,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexDirection: 'row'
-    },
-    logo: {
-        width: 130,
-        height: 100
-    },
-    invis: {
-        width: 45,
-        height: 45,
-        backgroundColor: 'transparent'
     },
     list: {
         width: '100%',

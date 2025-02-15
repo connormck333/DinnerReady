@@ -1,5 +1,5 @@
 import { URL } from "../firebase";
-import { Status } from "./interfaces";
+import { GetParam, Status } from "./interfaces";
 
 async function sendPostRequest(endpoint: string, authToken: string, body: any): Promise<Status> {
     try {
@@ -30,6 +30,44 @@ async function sendPostRequest(endpoint: string, authToken: string, body: any): 
     }
 }
 
+async function sendGetRequest(endpoint: string, authToken: string, params: GetParam[]): Promise<Status> {
+    try {
+        const response = await fetch(URL + endpoint + formatParams(params), {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': authToken,
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (response.status != 200) {
+            return { success: false, response: undefined };
+        }
+
+        let data: any;
+        try {
+            data = await response.json();
+        } catch (error: any) {}
+
+        return { success: true, response: data };
+
+    } catch (error: any) {
+        console.log(error);
+        return { success: false, response: undefined };
+    }
+}
+
+function formatParams(params: GetParam[]): string {
+    let query = "";
+    for (let param of params) {
+        query += "?" + param.key + "=" + encodeURIComponent(param.value);
+    }
+
+    return query;
+}
+
 export {
-    sendPostRequest
+    sendPostRequest,
+    sendGetRequest
 }

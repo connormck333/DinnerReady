@@ -1,23 +1,48 @@
-import { ReactElement, useState } from "react";
-import { StyleSheet, Dimensions } from "react-native";
+import { ReactElement, useState, useEffect } from "react";
+import { StyleSheet, Dimensions, View } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import RegistrationStack from "./registration/navigator";
 import HomeStack from "./home/navigator";
 import CalendarStack from "./calendar/navigator";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/methods/firebase";
+import { Status } from "@/methods/utils/interfaces";
+import { getUserDetails } from "@/methods/userManagement/getUserDetails";
 
 const Tab = createBottomTabNavigator();
 const { width } = Dimensions.get("window");
 
 export default function TabLayout(): ReactElement {
 
-    const [signedIn, setSignedIn] = useState(false);
+    const [signedIn, setSignedIn] = useState<boolean | undefined>(undefined);
+    const [signedInUser, setSignedInUser] = useState<any>(undefined);
 
-    if (signedIn) {
-        return <TabNavigator />
+    useEffect(() => {
+        (() => {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    const authToken = await user.getIdToken();
+                    const userDetails: Status = await getUserDetails(user.email as string, authToken);
+        
+                    if (userDetails.success) {
+                        setSignedInUser(userDetails.response);
+                        setSignedIn(true);
+                        return;
+                    }
+                }
+                setSignedIn(false);
+            }, () => setSignedIn(false));
+        })();
+    }, []);
+
+    if (signedIn === undefined) {
+        return <View />
+    } else if (!signedIn) {
+        return <RegistrationStack />
     }
 
-    return <RegistrationStack />
+    return <TabNavigator />
 }
 
 function TabNavigator(): ReactElement {
