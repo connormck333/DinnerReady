@@ -28,7 +28,7 @@ export default function UserAvatarScreen(props: any): ReactElement {
     }
 
     function goToCreateFamilyScreen(): void {
-        navigation.navigate("createFamily");
+        navigation.navigate("createFamily", {email: route.params?.email});
     }
 
     return (

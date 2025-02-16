@@ -26,12 +26,12 @@ interface User {
 
 interface QueryResponse {
     status: QueryStatus,
-    data: any
+    data?: any
 }
 
 interface QueryResponseExists {
     status: QueryStatus,
-    data: any,
+    data?: any,
     exists: boolean
 }
 

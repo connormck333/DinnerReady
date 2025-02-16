@@ -1,0 +1,48 @@
+import { onRequest, Request } from "firebase-functions/v2/https";
+import { Response } from "express";
+import { isPostReq } from "../utils/request_utils";
+import { GENERAL_ERROR_CODE, GENERAL_ERROR_MESSAGE, INVALID_REQUEST_CODE, INVALID_REQUEST_MESSAGE, SUCCESS_CODE, UNAUTHORISED_CODE, UNAUTHORISED_MESSAGE } from "../utils/status_codes";
+import { authenticateUserToken } from "../utils/authorisation";
+import { isUserAdmin } from "../utils/db/account";
+import { QueryResponse } from "../types/interfaces";
+import QueryStatus from "../types/query_status";
+import { createFamilyJoinCode } from "../utils/db/families";
+
+const createJoinCode = onRequest(async (req: Request, res: Response) => {
+
+    if (!isPostReq(req.method)) {
+        res.status(INVALID_REQUEST_CODE).send(INVALID_REQUEST_MESSAGE);
+        return;
+    }
+
+    let userEmail: string = req.body.email;
+    if (!userEmail) {
+        res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
+        return;
+    }
+    userEmail = userEmail.toLowerCase();
+
+    const token: string | undefined = req.headers.authorization;
+    if (!(await authenticateUserToken(token, userEmail))) {
+        res.status(UNAUTHORISED_CODE).send(UNAUTHORISED_MESSAGE);
+        return;
+    }
+
+    const response: QueryResponse = await isUserAdmin(userEmail);
+    if (response.status === QueryStatus.FAILURE || !response.data) {
+        res.status(UNAUTHORISED_CODE).send(UNAUTHORISED_MESSAGE);
+        return;
+    }
+
+    const codeResponse: QueryResponse = await createFamilyJoinCode(userEmail);
+    if (codeResponse.status === QueryStatus.FAILURE) {
+        res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
+        return;
+    }
+
+    res.status(SUCCESS_CODE).send(JSON.stringify({code: codeResponse.data}));
+});
+
+export {
+    createJoinCode
+}

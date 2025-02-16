@@ -108,13 +108,35 @@ async function getFamilyCreator(familyId: string): Promise<QueryResponseExists> 
     try {
         const snapshot: DocumentSnapshot = await db.collection("families").doc(familyId).get();
         if (!snapshot.exists) {
-            return { status: QueryStatus.SUCCESS, exists: false, data: null };
+            return { status: QueryStatus.SUCCESS, exists: false };
         }
 
         return { status: QueryStatus.SUCCESS, exists: true, data: snapshot.data()?.creator };
     } catch (error) {
-        return { status: QueryStatus.FAILURE, exists: false, data: null };
+        return { status: QueryStatus.FAILURE, exists: false };
     }
+}
+
+async function createFamilyJoinCode(userId: string): Promise<QueryResponse> {
+    const code = (Date.now().toString(36) + Math.random().toString(36).substring(13)).toUpperCase();
+
+    const response: QueryResponseExists = await getUserData(userId);
+    if (response.status === QueryStatus.FAILURE || !response.exists) {
+        return { status: response.status };
+    }
+
+    const familyId: string = response.data.familyId;
+
+    try {
+        await db.collection("joinCodes").add({
+            familyId: familyId,
+            code: code
+        });
+    } catch (error) {
+        return { status: QueryStatus.FAILURE };
+    }
+
+    return { status: QueryStatus.SUCCESS, data: code };
 }
 
 export {
@@ -122,5 +144,6 @@ export {
     getFamilyMembers,
     updateUsersAdminStatus,
     createNewFamily,
-    getFamilyCreator
+    getFamilyCreator,
+    createFamilyJoinCode
 }

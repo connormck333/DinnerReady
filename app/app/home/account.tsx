@@ -1,22 +1,43 @@
-import { ReactElement, useRef } from "react";
-import { View, StyleSheet, Text, Dimensions, Image, FlatList, TouchableOpacity, Animated } from "react-native";
+import { ReactElement, useContext, useRef, useState } from "react";
+import { View, StyleSheet, Text, Dimensions, Image, FlatList, TouchableOpacity, Animated, Alert } from "react-native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import LoweringContainer from "@/components/animations/LoweringContainer";
-import { LowerContainerRef } from "@/methods/utils/interfaces";
+import { LowerContainerRef, Status, UserContextType } from "@/methods/utils/interfaces";
 import SharedHeader from "@/components/SharedHeader";
+import { createJoinCode } from "@/methods/familyManagement/createJoinCode";
+import UserContext from "@/methods/context/userContext";
+import JoinCodeModal from "@/components/modals/JoinCodeModal";
 
 const { height } = Dimensions.get("window");
 
 export default function AccountScreen(): ReactElement {
 
+    const [user, setUser] = useContext(UserContext) as UserContextType;
+    const [code, setCode] = useState<string>("FWGGTH");
+    const [modalOpen, setModalOpen] = useState<boolean>(true);
     const loweringContainerRef = useRef<LowerContainerRef>(null);
 
     function closeModal(): void {
         loweringContainerRef.current?.closeScreen();
     }
 
+    async function createNewJoinCode(): Promise<void> {
+        const response: Status = await createJoinCode(user.email);
+        if (!response.success) {
+            Alert.alert("Error", "There was an error creating a join code. Please try again later.");
+            return;
+        }
+
+        setCode(response.response.code);
+        setModalOpen(true);
+    }
+
     return (
         <Animated.View>
+            <JoinCodeModal
+                visible={[modalOpen, setModalOpen]}
+                code={code}
+            />
             <LoweringContainer
                 ref={loweringContainerRef}
                 style={styles.container}
@@ -38,7 +59,7 @@ export default function AccountScreen(): ReactElement {
                             <Text style={styles.nameText}>Marge</Text>
                         </View>
                     )}
-                    ListFooterComponent={<Footer />}
+                    ListFooterComponent={<Footer createNewJoinCode={createNewJoinCode} />}
                 />
             </LoweringContainer>
         </Animated.View>
@@ -48,7 +69,10 @@ export default function AccountScreen(): ReactElement {
 function Footer(props: any): ReactElement {
     return (
         <View style={styles.footer}>
-            <TouchableOpacity style={[styles.btn, styles.inviteBtn, styles.center]}>
+            <TouchableOpacity
+                onPress={props.createNewJoinCode}
+                style={[styles.btn, styles.inviteBtn, styles.center]}
+            >
                 <MaterialIcons name="mail" size={24} color="#fff" />
                 <Text style={styles.btnText}>Invite</Text>
             </TouchableOpacity>

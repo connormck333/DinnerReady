@@ -26,15 +26,16 @@ export default function TabLayout(): ReactElement {
                     const authToken = await user.getIdToken();
                     const response: Status = await getUserDetails(user.email as string, authToken);
         
+                    setSignedIn(true);
                     if (response.success) {
                         const userDetails: User = response.response;
                         setSignedInUser(userDetails);
-                        setSignedIn(true);
                         return;
                     }
+                } else {
+                    setSignedIn(false);
+                    setSignedInUser(undefined);
                 }
-                setSignedIn(false);
-                setSignedInUser(undefined);
             }, () => {
                 setSignedIn(false);
                 setSignedInUser(undefined);
@@ -50,7 +51,7 @@ export default function TabLayout(): ReactElement {
                 <>
                     {!signedIn || (signedIn && !signedInUser?.hasCompletedOnboarding) ?
                         <RegistrationStack
-                            signedIn={signedIn}
+                            signedIn={[signedIn, setSignedIn]}
                             hasCompletedOnboarding={signedInUser?.hasCompletedOnboarding}
                         />
                         :

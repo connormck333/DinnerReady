@@ -3,15 +3,18 @@ import Form from "@/components/form/Form";
 import Input from "@/components/form/Input";
 import RegistrationHeader from "@/components/registration/RegistrationHeader";
 import UserContext from "@/methods/context/userContext";
+import { auth } from "@/methods/firebase";
 import { createFamilyAccount } from "@/methods/registration/createFamily";
 import { saveFamilyAvatar } from "@/methods/registration/saveAvatar";
+import { getUserDetails } from "@/methods/userManagement/getUserDetails";
 import { isValidName } from "@/methods/utils/inputValidation";
 import { Status, User, UserContextType } from "@/methods/utils/interfaces";
 import { ReactElement, useContext, useState } from "react";
 import { View, StyleSheet, Alert } from "react-native";
 
-export default function CreateFamilyAccountScreen(): ReactElement {
+export default function CreateFamilyAccountScreen(props: any): ReactElement {
 
+    const { navigation, route, setSignedIn } = props;
     const [user, setUser]: UserContextType = useContext(UserContext) as UserContextType;
     const [avatar, setAvatar] = useState<string | undefined>(undefined);
     const [familyName, setFamilyName] = useState<string>("");
@@ -22,7 +25,9 @@ export default function CreateFamilyAccountScreen(): ReactElement {
             return;
         }
 
-        const response: Status = await createFamilyAccount(user.email, familyName);
+        const email = user?.email === undefined ? route.params.email : user.email;
+        const response: Status = await createFamilyAccount(email, familyName);
+        console.log(email)
 
         if (!response.success) {
             Alert.alert("Error", "There was an error creating your family account. Please try again later.");
@@ -38,6 +43,11 @@ export default function CreateFamilyAccountScreen(): ReactElement {
             ...user,
             hasCompletedOnboarding: true
         });
+        setSignedIn(true);
+    }
+
+    function joinFamily(): void {
+        navigation.navigate("joinFamily", {email: route.params?.email});
     }
 
     return (
@@ -51,6 +61,7 @@ export default function CreateFamilyAccountScreen(): ReactElement {
                 onPress={createFamily}
                 secondButton={true}
                 secondButtonText="I have a code"
+                secondButtonOnPress={joinFamily}
             >
                 <AvatarInput
                     avatar={[avatar, setAvatar]}
