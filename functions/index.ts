@@ -1,5 +1,5 @@
 import { getUserInfo, removeAdminStatusFromFamilyMember, setUserAsFamilyAdmin } from "./src/triggers/account";
-import { createJoinCode } from "./src/triggers/families";
+import { createJoinCode, joinFamilyUsingCode } from "./src/triggers/families";
 import { createUser, createFamilyAccount, joinFamilyAccountAsAdmin, joinFamilyAccountAsMember } from "./src/triggers/registration";
 
 module.exports = {
@@ -10,5 +10,6 @@ module.exports = {
     getUserInfo,
     setUserAsFamilyAdmin,
     removeAdminStatusFromFamilyMember,
-    createJoinCode
+    createJoinCode,
+    joinFamilyUsingCode
 };

@@ -68,7 +68,7 @@ const getUserInfo = onRequest(async (req: Request, res: Response): Promise<void>
 
     const data: UserFamily = {
         firstName: userData.firstName,
-        surname: userData.surname,
+        lastName: userData.lastName,
         email: userEmail,
         familyData: familyData,
         admin: userData.admin,

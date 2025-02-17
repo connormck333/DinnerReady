@@ -2,7 +2,7 @@ import QueryStatus from "./query_status"
 
 interface UserFamily {
     firstName: string,
-    surname: string,
+    lastName: string,
     email: string | undefined,
     admin: boolean | undefined,
     hasCompletedOnboarding?: boolean,
@@ -17,7 +17,7 @@ interface Family {
 
 interface User {
     firstName: string,
-    surname: string,
+    lastName: string,
     familyId: string | undefined,
     email: string | undefined,
     admin: boolean | undefined,

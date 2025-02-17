@@ -34,7 +34,7 @@ async function getUserData(userId: string): Promise<QueryResponseExists> {
         }
         const userData: User = {
             firstName: snapshot.data()?.firstName,
-            surname: snapshot.data()?.surname,
+            lastName: snapshot.data()?.surname,
             email: userId,
             familyId: snapshot.data()?.familyId,
             admin: snapshot.data()?.admin,

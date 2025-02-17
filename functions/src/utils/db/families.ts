@@ -69,7 +69,7 @@ async function getFamilyMembers(familyId: string, userId: string | undefined): P
             const memberData: User = {
                 email: memberUserSnap.data()?.email,
                 firstName: memberUserSnap.data()?.firstName,
-                surname: memberUserSnap.data()?.surname,
+                lastName: memberUserSnap.data()?.surname,
                 familyId: familyId,
                 admin: memberUserSnap.data()?.admin
             }
@@ -128,7 +128,7 @@ async function createFamilyJoinCode(userId: string): Promise<QueryResponse> {
     const familyId: string = response.data.familyId;
 
     try {
-        await db.collection("joinCodes").add({
+        await db.collection("joinCodes").doc(code).set({
             familyId: familyId,
             code: code
         });
@@ -139,11 +139,33 @@ async function createFamilyJoinCode(userId: string): Promise<QueryResponse> {
     return { status: QueryStatus.SUCCESS, data: code };
 }
 
+async function joinFamilyByJoinCode(userId: string, code: string): Promise<boolean> {
+    const response: QueryResponseExists = await getUserData(userId);
+    if (response.status === QueryStatus.FAILURE || !response.exists || response.data?.familyId != null) {
+        return false;
+    }
+
+    const codeDoc: DocumentSnapshot = await db.collection("joinCodes").doc(code).get();
+    if (!codeDoc.exists) {
+        return false;
+    }
+
+    const familyId: string = codeDoc.data()?.familyId;
+    const success: boolean = await addUserToFamily(familyId, userId, false);
+
+    await db.collection("users").doc(userId).set({
+        hasCompletedOnboarding: true
+    }, { merge: true });
+
+    return success;
+}
+
 export {
     addUserToFamily,
     getFamilyMembers,
     updateUsersAdminStatus,
     createNewFamily,
     getFamilyCreator,
-    createFamilyJoinCode
+    createFamilyJoinCode,
+    joinFamilyByJoinCode
 }
