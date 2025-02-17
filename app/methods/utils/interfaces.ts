@@ -12,7 +12,15 @@ interface User {
     firstName: string,
     lastName: string,
     familyId: string | undefined,
+    familyData?: Family,
+    avatarUrl?: string,
     hasCompletedOnboarding: boolean
+}
+
+interface Family {
+    familyId: string,
+    members: User[],
+    name: string
 }
 
 interface Status {
@@ -37,5 +45,6 @@ export {
     GetParam,
     LowerContainerRef,
     User,
+    Family,
     UserContextType
 }

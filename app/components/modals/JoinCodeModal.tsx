@@ -1,5 +1,5 @@
-import { ReactElement, RefObject, useRef, useState } from 'react';
-import { View, Modal, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, LayoutChangeEvent } from 'react-native';
+import { ReactElement, useState } from 'react';
+import { View, Modal, StyleSheet, Text, TouchableOpacity, LayoutChangeEvent } from 'react-native';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import * as Clipboard from 'expo-clipboard';
 

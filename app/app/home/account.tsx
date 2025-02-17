@@ -1,21 +1,36 @@
-import { ReactElement, useContext, useRef, useState } from "react";
+import { ReactElement, useContext, useEffect, useRef, useState } from "react";
 import { View, StyleSheet, Text, Dimensions, Image, FlatList, TouchableOpacity, Animated, Alert } from "react-native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import LoweringContainer from "@/components/animations/LoweringContainer";
-import { LowerContainerRef, Status, UserContextType } from "@/methods/utils/interfaces";
+import { LowerContainerRef, Status, User, UserContextType } from "@/methods/utils/interfaces";
 import SharedHeader from "@/components/SharedHeader";
 import { createJoinCode } from "@/methods/familyManagement/createJoinCode";
 import UserContext from "@/methods/context/userContext";
 import JoinCodeModal from "@/components/modals/JoinCodeModal";
+import { getFamilyMembersAvatars } from "@/methods/familyManagement/getFamilyMembersAvatars";
 
 const { height } = Dimensions.get("window");
 
 export default function AccountScreen(): ReactElement {
 
     const [user, setUser] = useContext(UserContext) as UserContextType;
-    const [code, setCode] = useState<string>("FWGGTH");
-    const [modalOpen, setModalOpen] = useState<boolean>(true);
+    const [members, setMembers] = useState<User[]>([]);
+    const [code, setCode] = useState<string>("");
+    const [modalOpen, setModalOpen] = useState<boolean>(false);
     const loweringContainerRef = useRef<LowerContainerRef>(null);
+
+    useEffect(() => {
+        (async () => {
+            const familyMembers: User[] = [user, ...user.familyData?.members as []];
+
+            const urls: string[] = await getFamilyMembersAvatars(familyMembers);
+            for (let i = 0; i < urls.length; i++) {
+                familyMembers[i].avatarUrl = urls[i];
+            }
+
+            setMembers(familyMembers);
+        })();
+    }, []);
 
     function closeModal(): void {
         loweringContainerRef.current?.closeScreen();
@@ -43,7 +58,7 @@ export default function AccountScreen(): ReactElement {
                 style={styles.container}
             >
                 <FlatList
-                    data={[1,2,3,4]}
+                    data={members}
                     numColumns={2}
                     style={styles.list}
                     ListHeaderComponent={<SharedHeader goBack={closeModal} />}
@@ -52,11 +67,11 @@ export default function AccountScreen(): ReactElement {
                             marginTop: index > 1 ? 20 : 0
                         }]}>
                             <Image
-                                source={{ uri: "https://preview.redd.it/looking-for-opponents-for-marge-simpson-the-simpsons-for-a-v0-vcvx5mj6mypa1.jpg?width=1080&crop=smart&auto=webp&s=d7fd5a47b79f23e32f5941a3a685366a42c9bdf5" }}
+                                source={{ uri: item.avatarUrl  }}
                                 style={styles.avatar}
                                 resizeMode="cover"
                             />
-                            <Text style={styles.nameText}>Marge</Text>
+                            <Text style={styles.nameText}>{ item?.firstName } { item.lastName }</Text>
                         </View>
                     )}
                     ListFooterComponent={<Footer createNewJoinCode={createNewJoinCode} />}
@@ -114,7 +129,9 @@ const styles = StyleSheet.create({
     nameText: {
         fontSize: 20,
         fontWeight: '500',
-        marginTop: 5
+        marginTop: 5,
+        width: '85%',
+        textAlign: 'center'
     },
     footer: {
         marginTop: 40,

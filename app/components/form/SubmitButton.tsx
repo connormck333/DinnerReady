@@ -1,5 +1,5 @@
 import { ReactElement } from "react";
-import { TouchableOpacity, StyleSheet, Text } from "react-native";
+import { TouchableOpacity, StyleSheet, Text, ActivityIndicator } from "react-native";
 
 export default function SubmitButton(props: any): ReactElement {
 
@@ -10,7 +10,11 @@ export default function SubmitButton(props: any): ReactElement {
                 marginTop: props.marginTop ? 40 : 0
             }]}
         >
-            <Text style={styles.text}>{ props.text }</Text>
+            { props.loading ?
+                <ActivityIndicator size="small" color="#fff" />
+                :
+                <Text style={styles.text}>{ props.text }</Text>
+            }
         </TouchableOpacity>
     );
 }

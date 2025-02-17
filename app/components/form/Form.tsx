@@ -1,9 +1,18 @@
-import { ReactElement } from 'react';
+import { ReactElement, useState } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import SubmitButton from './SubmitButton';
 import SecondaryButton from './SecondaryButton';
 
 export default function Form(props: any): ReactElement {
+
+    const [loading, setLoading] = useState<boolean>(false);
+
+    async function onMainButtonPress(): Promise<void> {
+        setLoading(true);
+        await props.onPress();
+        setLoading(false);
+    }
+
     return (
         <View style={[styles.container, props.style]}>
             <View>
@@ -14,7 +23,8 @@ export default function Form(props: any): ReactElement {
                     props.button &&
                     <SubmitButton
                         text={props.buttonText}
-                        onPress={props.onPress}
+                        onPress={onMainButtonPress}
+                        loading={loading}
                     />
                 }
                 {
