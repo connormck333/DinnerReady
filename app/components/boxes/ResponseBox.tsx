@@ -1,33 +1,41 @@
-import { View, StyleSheet, Image, Text } from "react-native";
+import { View, StyleSheet, Image, Text, FlatList } from "react-native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import InfoBox from "./InfoBox";
+import { useContext } from "react";
+import UserContext from "@/methods/context/userContext";
+import { UserContextType } from "@/methods/utils/interfaces";
 
 export default function ResponseBox(props: any) {
 
-    const users = [1, 2, 3, 4 ,5, 6, 6, 7, 8];
+    const [user, setUser] = useContext(UserContext) as UserContextType;
 
     return (
         <InfoBox containerStyle={styles.column}>
-            { users.map((item, index) => (
-                <View style={[styles.row, {
-                    marginTop: index === 0 ? 0 : 15
-                }]}>
-                    <View style={[styles.w75, styles.row]}>
-                        <Image
-                            style={styles.avatar}
-                            source={{ uri: 'https://i.pinimg.com/736x/1d/b9/18/1db918fe2b5dff69f35186ad20cc1752.jpg' }}
-                            resizeMode="cover"
-                        />
-                        <View style={[styles.column, styles.textContainer]}>
-                            <Text style={styles.headerText}>Connor McKenzie</Text>
-                            <Text style={styles.infoText}>Attending</Text>
+            <FlatList
+                data={[user, ...user.familyData?.members as []]}
+                scrollEnabled={false}
+                keyExtractor={(item) => item.email}
+                renderItem={({ item, index }) => (
+                    <View style={[styles.row, {
+                        marginTop: index === 0 ? 0 : 15
+                    }]}>
+                        <View style={[styles.w75, styles.row]}>
+                            <Image
+                                style={styles.avatar}
+                                source={{ uri: item.avatarUrl }}
+                                resizeMode="cover"
+                            />
+                            <View style={[styles.column, styles.textContainer]}>
+                                <Text style={styles.headerText}>{ item.firstName } { item.lastName }</Text>
+                                <Text style={styles.infoText}>Attending</Text>
+                            </View>
+                        </View>
+                        <View style={[styles.w25, styles.flexEnd]}>
+                            <MaterialIcons name="check-circle-outline" size={35} color="#068c00" />
                         </View>
                     </View>
-                    <View style={[styles.w25, styles.flexEnd]}>
-                        <MaterialIcons name="check-circle-outline" size={35} color="#068c00" />
-                    </View>
-                </View>
-            ))}
+                )}
+            />
         </InfoBox>
     );
 }

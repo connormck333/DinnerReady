@@ -10,6 +10,7 @@ import { auth } from "@/methods/firebase";
 import { Status, User, UserContextType } from "@/methods/utils/interfaces";
 import { getUserDetails } from "@/methods/userManagement/getUserDetails";
 import UserContext from "@/methods/context/userContext";
+import { getFamilyMembersAvatars } from "@/methods/familyManagement/getFamilyMembersAvatars";
 
 const Tab = createBottomTabNavigator();
 const { width } = Dimensions.get("window");
@@ -30,6 +31,7 @@ export default function TabLayout(): ReactElement {
                     if (response.success) {
                         const userDetails: User = response.response;
                         setSignedInUser(userDetails);
+                        loadAvatars(userDetails);
                         return;
                     }
                 } else {
@@ -42,6 +44,20 @@ export default function TabLayout(): ReactElement {
             });
         })();
     }, []);
+
+    async function loadAvatars(userDetails: User): Promise<void> {
+        if (userDetails.familyData) {
+            const familyMembers: User[] = [userDetails, ...userDetails.familyData.members as []];
+
+            const urls: string[] = await getFamilyMembersAvatars(familyMembers);
+            userDetails.avatarUrl = urls[0];
+            for (let i = 1; i < urls.length; i++) {
+                userDetails.familyData.members[i - 1].avatarUrl = urls[i];
+            }
+
+            setSignedInUser({...userDetails});
+        }
+    }
 
     return (
         <UserContext.Provider value={[signedInUser, setSignedInUser] as UserContextType}>

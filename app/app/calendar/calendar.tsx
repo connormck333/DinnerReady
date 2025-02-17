@@ -3,11 +3,14 @@ import { View, StyleSheet, Image, TouchableOpacity, Text } from 'react-native';
 import { Calendar, toDateId, CalendarTheme } from "@marceloterreiro/flash-calendar";
 import GreenOverlay from '@/components/GreenOverlay';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import CalendarEventModal from '@/components/modals/CalendarEventModal';
 
 export default function CalendarScreen(): ReactElement {
 
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedMonth, _setSelectedMonth] = useState(toDateId(currentDate));
+    const [modalOpen, setModalOpen] = useState<boolean>(false);
+    const [selectedDate, setSelectedDate] = useState<string>("");
 
     function setSelectedMonth(date: Date): void {
         setCurrentDate(date);
@@ -26,8 +29,17 @@ export default function CalendarScreen(): ReactElement {
         setSelectedMonth(date);
     }
 
+    function onCalendarDayPress(dateId: string): void {
+        setSelectedDate(dateId);
+        setModalOpen(true);
+    }
+
     return (
         <View style={styles.container}>
+            <CalendarEventModal
+                visible={[modalOpen, setModalOpen]}
+                date={selectedDate}
+            />
             <GreenOverlay
                 height={150}
                 style={styles.overlay}
@@ -47,7 +59,7 @@ export default function CalendarScreen(): ReactElement {
                         // },
                     ]}
                     calendarMonthId={selectedMonth}
-                    onCalendarDayPress={() => {}}
+                    onCalendarDayPress={onCalendarDayPress}
                     theme={calendarTheme}
                 />
                 <View style={styles.btnsContainer}>

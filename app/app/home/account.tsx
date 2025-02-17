@@ -1,36 +1,21 @@
-import { ReactElement, useContext, useEffect, useRef, useState } from "react";
+import { ReactElement, useContext, useRef, useState } from "react";
 import { View, StyleSheet, Text, Dimensions, Image, FlatList, TouchableOpacity, Animated, Alert } from "react-native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import LoweringContainer from "@/components/animations/LoweringContainer";
-import { LowerContainerRef, Status, User, UserContextType } from "@/methods/utils/interfaces";
+import { LowerContainerRef, Status, UserContextType } from "@/methods/utils/interfaces";
 import SharedHeader from "@/components/SharedHeader";
 import { createJoinCode } from "@/methods/familyManagement/createJoinCode";
 import UserContext from "@/methods/context/userContext";
 import JoinCodeModal from "@/components/modals/JoinCodeModal";
-import { getFamilyMembersAvatars } from "@/methods/familyManagement/getFamilyMembersAvatars";
 
 const { height } = Dimensions.get("window");
 
 export default function AccountScreen(): ReactElement {
 
     const [user, setUser] = useContext(UserContext) as UserContextType;
-    const [members, setMembers] = useState<User[]>([]);
     const [code, setCode] = useState<string>("");
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const loweringContainerRef = useRef<LowerContainerRef>(null);
-
-    useEffect(() => {
-        (async () => {
-            const familyMembers: User[] = [user, ...user.familyData?.members as []];
-
-            const urls: string[] = await getFamilyMembersAvatars(familyMembers);
-            for (let i = 0; i < urls.length; i++) {
-                familyMembers[i].avatarUrl = urls[i];
-            }
-
-            setMembers(familyMembers);
-        })();
-    }, []);
 
     function closeModal(): void {
         loweringContainerRef.current?.closeScreen();
@@ -58,7 +43,7 @@ export default function AccountScreen(): ReactElement {
                 style={styles.container}
             >
                 <FlatList
-                    data={members}
+                    data={[user, ...user.familyData?.members as []]}
                     numColumns={2}
                     style={styles.list}
                     ListHeaderComponent={<SharedHeader goBack={closeModal} />}
