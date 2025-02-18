@@ -4,8 +4,8 @@ import { isGetReq, isPostReq } from "../utils/request_utils";
 import { GENERAL_ERROR_CODE, GENERAL_ERROR_MESSAGE, INVALID_REQUEST_CODE, INVALID_REQUEST_MESSAGE, SUCCESS_CODE, SUCCESS_MESSAGE, UNAUTHORISED_CODE, UNAUTHORISED_MESSAGE } from "../utils/status_codes";
 import { authenticateUserToken } from "../utils/authorisation";
 import { getFamilyId, getUserData, isUserAdmin } from "../utils/db/account";
-import { Attendee, Dinner, QueryResponse, User } from "../types/interfaces";
-import { createNewDinner, doesDinnerExist, getDinner, setAttendanceForDinnerWithId, setAttendanceForDinnerWithoutId } from "../utils/db/dinner";
+import { Attendee, Dinner, QueryResponse, QueryResponseExists, User } from "../types/interfaces";
+import { createNewDinner, doesDinnerExist, getDinner, getUserAttendanceCalendar, setAttendanceForDinnerWithId, setAttendanceForDinnerWithoutId } from "../utils/db/dinner";
 import QueryStatus from "../types/query_status";
 
 const startDinner = onRequest(async (req: Request, res: Response): Promise<void> => {
@@ -45,7 +45,7 @@ const startDinner = onRequest(async (req: Request, res: Response): Promise<void>
         description: body.description
     }
 
-    const dinnerExistsResponse: QueryResponse = await doesDinnerExist(userEmail, userData.familyId, body.date);
+    const dinnerExistsResponse: QueryResponse = await doesDinnerExist(userData.familyId, body.date);
     if (dinnerExistsResponse.status == QueryStatus.FAILURE) {
         res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
         return;
@@ -136,7 +136,7 @@ const optOutForDinner = onRequest(async (req: Request, res: Response): Promise<v
     }
 
     const body: any = req.body;
-    const token: string | undefined = req.headers.authorization;
+    const token: string = req.headers.authorization as string;
     const userEmail: string = body.email.toLowerCase();
     if (!(await authenticateUserToken(token, userEmail))) {
         res.status(UNAUTHORISED_CODE).send(UNAUTHORISED_MESSAGE);
@@ -152,16 +152,46 @@ const optOutForDinner = onRequest(async (req: Request, res: Response): Promise<v
     res.status(SUCCESS_CODE).send(SUCCESS_MESSAGE);
 });
 
+const getUserDinnerAttendances = onRequest(async (req: Request, res: Response): Promise<void> => {
+
+    if (!isGetReq(req.method)) {
+        res.status(INVALID_REQUEST_CODE).send(INVALID_REQUEST_MESSAGE);
+        return;
+    }
+
+    const token: string = req.headers.authorization as string;
+    const userEmail: string = req.query.email as string;
+    if (!(await authenticateUserToken(token, userEmail))) {
+        res.status(UNAUTHORISED_CODE).send(UNAUTHORISED_MESSAGE);
+        return;
+    }
+
+    const userData: QueryResponseExists = await getUserData(userEmail);
+    if (!userData.exists || userData.status === QueryStatus.FAILURE) {
+        res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
+        return;
+    }
+    
+    const familyId: string = userData.data.familyId;
+    const response: QueryResponse = await getUserAttendanceCalendar(userEmail, familyId);
+    if (response.status === QueryStatus.FAILURE) {
+        res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
+        return;
+    }
+
+    res.status(SUCCESS_CODE).send(JSON.stringify(response.data));
+})
+
 async function registerAttendanceForDinner(userEmail: string, body: any, attendingStatus: boolean): Promise<boolean> {
     const familyIdResponse: QueryResponse = await getFamilyId(userEmail);
     if (familyIdResponse.status === QueryStatus.FAILURE) return false;
 
-    const familyId: string = familyIdResponse.data.familyId;
+    const familyId: string = familyIdResponse.data;
     const dinnerId: string | null = body?.dinnerId;
     const date: string = body?.date;
 
     // Check if dinnerId exists
-    const response: QueryResponse = await doesDinnerExist(userEmail, familyId, date);
+    const response: QueryResponse = await doesDinnerExist(familyId, date);
     if (response.status == QueryStatus.FAILURE) {
         return false;
     }
@@ -182,5 +212,6 @@ export {
     startDinner,
     optInForDinner,
     optOutForDinner,
-    getDinnerDetails
+    getDinnerDetails,
+    getUserDinnerAttendances
 }

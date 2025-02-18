@@ -26,7 +26,7 @@ async function createNewDinner(familyId: string, dinnerData: Dinner): Promise<Qu
 
         return { status: QueryStatus.SUCCESS, data: dinner };
     } catch (error) {
-        return { status: QueryStatus.FAILURE, data: null };
+        return { status: QueryStatus.FAILURE };
     }
 }
 
@@ -49,12 +49,12 @@ async function getDinner(familyId: string, dinnerId: string): Promise<QueryRespo
             date: data.data()?.date
         }
     } catch (error) {
-        return { status: QueryStatus.FAILURE, data: null };
+        return { status: QueryStatus.FAILURE };
     }
 
     const membersResponse: QueryResponse = await getFamilyMembers(familyId, undefined);
     if (membersResponse.status === QueryStatus.FAILURE) {
-        return { status: QueryStatus.FAILURE, data: null };
+        return { status: QueryStatus.FAILURE };
     }
 
     const attendees: Attendee[] = [];
@@ -69,7 +69,7 @@ async function getDinner(familyId: string, dinnerId: string): Promise<QueryRespo
             });
         }
     } catch (error) {
-        return { status: QueryStatus.FAILURE, data: null };
+        return { status: QueryStatus.FAILURE };
     }
 
     const dinnerStatus: DinnerStatus = {
@@ -91,6 +91,10 @@ async function setAttendanceForDinnerWithId(userId: string, familyId: string, di
         await ref.collection("responses").doc(userId).set({
             email: userId,
             attending: attendingStatus
+        });
+
+        await db.collection("users").doc(userId).collection("responses").doc(dinnerId).set({
+            dinnerId: dinnerId
         });
     } catch (error) {
         return false;
@@ -135,7 +139,7 @@ async function getAttendanceForDinner(userId: string, familyId: string, dinnerId
     }
 }
 
-async function doesDinnerExist(userId: string, familyId: string, date: string): Promise<QueryResponse> {
+async function doesDinnerExist(familyId: string, date: string): Promise<QueryResponse> {
     const ref: CollectionReference = db
         .collection("families")
         .doc(familyId)
@@ -151,7 +155,37 @@ async function doesDinnerExist(userId: string, familyId: string, date: string): 
             }
         };
     } catch (error) {
-        return { status: QueryStatus.FAILURE, data: null };
+        return { status: QueryStatus.FAILURE };
+    }
+}
+
+async function getUserAttendanceCalendar(userId: string, familyId: string): Promise<QueryResponse> {
+    const userRef: CollectionReference = db
+        .collection("users")
+        .doc(userId)
+        .collection("responses");
+
+    const dinnerRef: CollectionReference = db
+        .collection("families")
+        .doc(familyId)
+        .collection("dinners")
+
+    try {
+        const response: QuerySnapshot = await userRef.get();
+
+        const attendances: any[] = [];
+        for (let doc of response.docs) {
+            const dinnerDate: DocumentSnapshot = await dinnerRef.doc(doc.id).get();
+            const dinner = await dinnerRef.doc(doc.id).collection("responses").doc(userId).get();
+            attendances.push({
+                date: dinnerDate.data()?.date,
+                attending: dinner.data()?.attending
+            });
+        }
+
+        return { status: QueryStatus.SUCCESS, data: attendances };
+    } catch (error) {
+        return { status: QueryStatus.FAILURE };
     }
 }
 
@@ -160,5 +194,6 @@ export {
     setAttendanceForDinnerWithId,
     setAttendanceForDinnerWithoutId,
     getDinner,
-    doesDinnerExist
+    doesDinnerExist,
+    getUserAttendanceCalendar
 }

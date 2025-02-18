@@ -1,16 +1,46 @@
-import { ReactElement, useState } from 'react';
-import { View, StyleSheet, Image, TouchableOpacity, Text } from 'react-native';
+import { ReactElement, useContext, useEffect, useState } from 'react';
+import { View, StyleSheet, Image, TouchableOpacity, Text, Alert } from 'react-native';
 import { Calendar, toDateId, CalendarTheme } from "@marceloterreiro/flash-calendar";
 import GreenOverlay from '@/components/GreenOverlay';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import CalendarEventModal from '@/components/modals/CalendarEventModal';
+import { Status, UserContextType } from '@/methods/utils/interfaces';
+import { getUserDinnerAttendances } from '@/methods/dinnerManagement/getUserDinnerAttendances';
+import UserContext from '@/methods/context/userContext';
 
 export default function CalendarScreen(): ReactElement {
 
-    const [currentDate, setCurrentDate] = useState(new Date());
-    const [selectedMonth, _setSelectedMonth] = useState(toDateId(currentDate));
+    const [user, setUser] = useContext(UserContext) as UserContextType;
+    const [currentDate, setCurrentDate] = useState<Date>(new Date());
+    const [attendanceDates, setAttendanceDates] = useState<any[]>([]);
+    const [selectedMonth, _setSelectedMonth] = useState<string>(toDateId(currentDate));
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [selectedDate, setSelectedDate] = useState<string>("");
+
+    useEffect(() => {
+        (() => {
+            loadDinnerCalendar();
+        })();
+    }, []);
+
+    async function loadDinnerCalendar(): Promise<void> {
+        const response: Status = await getUserDinnerAttendances(user.email);
+        if (!response.success) {
+            Alert.alert("Error", "There was an error loading your calendar.");
+            return;
+        }
+
+        const coloredDates: any[] = [];
+        for (let date of response.response) {
+            const readableDateString: string = date.date.split("/").reverse().join("-");
+            coloredDates.push({
+                startId: readableDateString,
+                endId: readableDateString
+            });
+        }
+
+        setAttendanceDates(coloredDates);
+    }
 
     function setSelectedMonth(date: Date): void {
         setCurrentDate(date);
@@ -52,12 +82,7 @@ export default function CalendarScreen(): ReactElement {
             </GreenOverlay>
             <View style={styles.calendarContainer}>
                 <Calendar
-                    calendarActiveDateRanges={[
-                        // {
-                        //     startId: today,
-                        //     endId: today,
-                        // },
-                    ]}
+                    calendarActiveDateRanges={attendanceDates}
                     calendarMonthId={selectedMonth}
                     onCalendarDayPress={onCalendarDayPress}
                     theme={calendarTheme}
@@ -175,9 +200,9 @@ const calendarTheme: CalendarTheme = {
                 fontSize: 16
             }
         }),
-        active: () => ({
+        active: ({  }) => ({
             container: {
-                backgroundColor: "#e99f00"
+                backgroundColor: "red"
             },
             content: {
                 color: "#000",

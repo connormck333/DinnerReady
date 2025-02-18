@@ -1,5 +1,5 @@
 import { ReactElement } from "react";
-import { TouchableOpacity, StyleSheet, Text } from "react-native";
+import { TouchableOpacity, StyleSheet, Text, ActivityIndicator } from "react-native";
 
 export default function GeneralButton(props: any): ReactElement {
 
@@ -7,8 +7,13 @@ export default function GeneralButton(props: any): ReactElement {
         <TouchableOpacity
             onPress={props.onPress}
             style={[styles.container, props.style]}
+            disabled={props.loading}
         >
-            <Text style={styles.text}>{ props.text }</Text>
+            { props.loading ?
+                <ActivityIndicator color="#fff" size="small" />
+                :
+                <Text style={styles.text}>{ props.text }</Text>
+            }
         </TouchableOpacity>
     );
 }
