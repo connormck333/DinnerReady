@@ -14,7 +14,8 @@ interface User {
     familyId: string | undefined,
     familyData?: Family,
     avatarUrl?: string,
-    hasCompletedOnboarding: boolean
+    hasCompletedOnboarding: boolean,
+    admin?: boolean
 }
 
 interface Family {

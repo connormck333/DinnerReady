@@ -16,6 +16,7 @@ export default function HomeScreen(props: any): ReactElement {
     const { navigation } = props;
     const [user, setUser] = useContext(UserContext) as UserContextType;
     const [currentDinner, setCurrentDinner] = useState<any>({attendance: []});
+    const [isUserAttending, setUserAttending] = useState<boolean | undefined>(undefined);
     const [avatars, setAvatars] = useState<Map<string, string>>(new Map());
 
     const [loading, setLoading] = useState<boolean>(true);
@@ -29,20 +30,33 @@ export default function HomeScreen(props: any): ReactElement {
 
     async function loadCurrentDinner(): Promise<void> {
         const response: Status = await getCurrentDinner(user.email);
-        console.log(response);
-        if (!response.success) {
-            setError(true);
-        } else {
-            const userAvatars: Map<string, string> = new Map();
-            for (let user of response.response.attendance) {
-                const avatarUrl: string = await getAvatarUrl(user.user.email);
-                userAvatars.set(user.user.email, avatarUrl);
+        if (!response.success) return;
+
+        const userAvatars: Map<string, string> = new Map();
+        for (let currentUser of response.response.attendance) {
+            if (currentUser.user.email === user.email) {
+                setUserAttending(currentUser.attending);
             }
-            setAvatars(userAvatars);
-            setCurrentDinner(response.response);
+            const avatarUrl: string = await getAvatarUrl(currentUser.user.email);
+            userAvatars.set(currentUser.user.email, avatarUrl);
         }
+        setAvatars(userAvatars);
+        setCurrentDinner(response.response);
 
         setLoading(false);
+    }
+
+    function onAttendanceRegistered(attending: boolean): void {
+        setUserAttending(attending);
+
+        const newDinner = {...currentDinner};
+        for (let currentUser of newDinner.attendance) {
+            if (currentUser.user.email.toLowerCase() === user.email.toLowerCase()) {
+                currentUser.attending = attending;
+            }
+        }
+
+        setCurrentDinner(newDinner);
     }
 
     function openAccountScreen(): void {
@@ -74,13 +88,18 @@ export default function HomeScreen(props: any): ReactElement {
                         icon={<MaterialIcons name="settings" size={24} color="black" />}
                     />
                 </View>
-                <StartButton containerStyle={styles.startButtonContainer} />
+                <StartButton
+                    containerStyle={styles.startButtonContainer}
+                    attending={isUserAttending}
+                    callback={onAttendanceRegistered}
+                />
             </GreenOverlay>
 
             <View style={styles.infoContainer}>
                 <ResponseBox
                     data={currentDinner.attendance}
                     avatars={avatars}
+                    loading={loading}
                 />
             </View>
         </ScrollView>

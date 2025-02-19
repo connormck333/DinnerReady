@@ -1,4 +1,4 @@
-import { ReactElement, useContext, useRef, useState } from "react";
+import { ReactElement, useContext, useEffect, useRef, useState } from "react";
 import { View, StyleSheet, Text, Dimensions, Image, FlatList, TouchableOpacity, Animated, Alert } from "react-native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import LoweringContainer from "@/components/animations/LoweringContainer";
@@ -7,6 +7,7 @@ import SharedHeader from "@/components/SharedHeader";
 import { createJoinCode } from "@/methods/familyManagement/createJoinCode";
 import UserContext from "@/methods/context/userContext";
 import JoinCodeModal from "@/components/modals/JoinCodeModal";
+import { DEFAULT_AVATAR_URL, getFamilyAvatarUrl } from "@/methods/userManagement/getAvatarUrl";
 
 const { height } = Dimensions.get("window");
 
@@ -46,7 +47,12 @@ export default function AccountScreen(): ReactElement {
                     data={[user, ...user.familyData?.members as []]}
                     numColumns={2}
                     style={styles.list}
-                    ListHeaderComponent={<SharedHeader goBack={closeModal} />}
+                    ListHeaderComponent={
+                        <SharedHeader
+                            rightButton={<FamilyImage familyId={user.familyData?.familyId} />}
+                            goBack={closeModal}
+                        />
+                    }
                     renderItem={({ item, index }) => (
                         <View style={[styles.item, {
                             marginTop: index > 1 ? 20 : 0
@@ -59,7 +65,7 @@ export default function AccountScreen(): ReactElement {
                             <Text style={styles.nameText}>{ item?.firstName } { item.lastName }</Text>
                         </View>
                     )}
-                    ListFooterComponent={<Footer createNewJoinCode={createNewJoinCode} />}
+                    ListFooterComponent={user.admin ? <Footer createNewJoinCode={createNewJoinCode} /> : <View />}
                 />
             </LoweringContainer>
         </Animated.View>
@@ -67,6 +73,7 @@ export default function AccountScreen(): ReactElement {
 }
 
 function Footer(props: any): ReactElement {
+
     return (
         <View style={styles.footer}>
             <TouchableOpacity
@@ -81,6 +88,30 @@ function Footer(props: any): ReactElement {
                 <Text style={styles.btnText}>Settings</Text>
             </TouchableOpacity>
         </View>
+    );
+}
+
+function FamilyImage(props: any): ReactElement {
+
+    const [imageUrl, setImageUrl] = useState<string>(DEFAULT_AVATAR_URL);
+
+    useEffect(() => {
+        (() => {
+            loadImageUrl();
+        })();
+    }, []);
+
+    async function loadImageUrl(): Promise<void> {
+        const url: string = await getFamilyAvatarUrl(props.familyId);
+        setImageUrl(url);
+    }
+
+    return (
+        <Image
+            source={{ uri: imageUrl }}
+            style={styles.familyImg}
+            resizeMode="cover"
+        />
     );
 }
 
@@ -154,5 +185,10 @@ const styles = StyleSheet.create({
     center: {
         alignItems: 'center',
         justifyContent: 'center'
+    },
+    familyImg: {
+        width: 45,
+        height: 45,
+        borderRadius: 22.5
     }
 });

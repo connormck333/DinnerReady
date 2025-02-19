@@ -16,7 +16,11 @@ export default function SharedHeader(props: any): ReactElement {
                 style={styles.logo}
                 resizeMode="contain"
             />
-            <View style={styles.invis} />
+            { props.rightButton ?
+                props.rightButton
+                :
+                <View style={styles.invis} />
+            }
         </View>
     )
 }

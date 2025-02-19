@@ -1,21 +1,69 @@
 import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import { ReactElement, useContext, useState } from "react";
+import UserContext from "@/methods/context/userContext";
+import { UserContextType } from "@/methods/utils/interfaces";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import CalendarEventModal from "../modals/CalendarEventModal";
 
-export default function StartButton(props: any) {
+export default function StartButton(props: any): ReactElement {
+
+    const [user] = useContext(UserContext) as UserContextType;
+    const [modalOpen, setModalOpen] = useState<boolean>(false);
 
     return (
         <View style={props.containerStyle}>
+            <CalendarEventModal
+                visible={[modalOpen, setModalOpen]}
+                date={new Date(Date.now())}
+                callback={props.callback}
+            />
             <View style={[styles.largeCircle, styles.center]}>
                 <View style={[styles.middleCircle, styles.center]}>
                     <TouchableOpacity
                         style={[styles.smallCircle, styles.center]}
                         activeOpacity={0.6}
+                        onPress={() => setModalOpen(true)}
                     >
-                        <MaterialCommunityIcons name="bell" size={70} color="#002f09" />
-                        <Text style={styles.text}>Send Reminders</Text>
+                        { user.admin ?
+                            <View style={styles.center}>
+                                <MaterialCommunityIcons name="bell" size={70} color="#002f09" />
+                                <Text style={styles.text}>Send Reminders</Text>
+                            </View>
+                            :
+                            <UserButton
+                                attending={props.attending}
+                            />
+                        }
                     </TouchableOpacity>
                 </View>
             </View>
+        </View>
+    );
+}
+
+function UserButton(props: any): ReactElement {
+
+    if (props.attending) {
+        return (
+            <View style={styles.center}>
+                <MaterialIcons name="check-circle" size={80} color="#002f09" />
+                <Text style={styles.text}>Attending</Text>
+            </View>
+        );
+    } else if (props.attending === false) {
+        return (
+            <View style={styles.center}>
+                <MaterialCommunityIcons name="close-circle" size={80} color="#002f09" />
+                <Text style={styles.text}>Not Attending</Text>
+            </View>
+        );
+    }
+
+    return (
+        <View style={styles.center}>
+            <MaterialCommunityIcons name="alert-circle-outline" size={80} color="#002f09" />
+            <Text style={styles.text}>Set Attendance</Text>
         </View>
     );
 }

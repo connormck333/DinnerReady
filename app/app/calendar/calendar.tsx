@@ -37,6 +37,7 @@ export default function CalendarScreen(): ReactElement {
         const dates: any[] = [];
         const colors: Map<string, string> = new Map();
         for (let date of response.response) {
+            if (!date.date) continue;
             const readableDateString: string = date.date.split("/").reverse().join("-");
             dates.push({
                 startId: readableDateString,
@@ -117,7 +118,7 @@ export default function CalendarScreen(): ReactElement {
             }),
             today: () => ({
                 container: {
-                    backgroundColor: "#1bb100"
+                    backgroundColor: "#fcb825"
                 },
                 content: {
                     color: "#000",

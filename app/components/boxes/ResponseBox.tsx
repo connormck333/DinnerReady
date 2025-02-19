@@ -1,4 +1,4 @@
-import { View, StyleSheet, Image, Text, FlatList } from "react-native";
+import { View, StyleSheet, Image, Text, FlatList, ActivityIndicator } from "react-native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import InfoBox from "./InfoBox";
 import { ReactElement } from "react";
@@ -18,6 +18,7 @@ export default function ResponseBox(props: any): ReactElement {
                 data={props.data}
                 scrollEnabled={false}
                 keyExtractor={(item) => item.email}
+                ListEmptyComponent={props.loading ? <ActivityIndicator color="#000" size="small" /> : <View />}
                 renderItem={({ item, index }) => (
                     <View style={[styles.row, {
                         marginTop: index === 0 ? 0 : 15
