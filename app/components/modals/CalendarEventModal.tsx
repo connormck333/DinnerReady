@@ -9,7 +9,7 @@ import { optOutForDinner } from '@/methods/dinnerManagement/optOutForDinner';
 
 export default function CalendarEventModal(props: any) {
 
-    const [user, setUser] = useContext(UserContext) as UserContextType;
+    const [user] = useContext(UserContext) as UserContextType;
     const [inLoading, setInLoading] = useState<boolean>(false);
     const [outLoading, setOutLoading] = useState<boolean>(false);
     const [visible, setVisible] = props.visible;
@@ -22,7 +22,7 @@ export default function CalendarEventModal(props: any) {
         const response: Status = await optInForDinner(user.email, date.toLocaleDateString("en-GB"));
         setInLoading(false);
 
-        handleResponse(response);
+        handleResponse(response, true);
     }
 
     async function optOut(): Promise<void> {
@@ -32,10 +32,10 @@ export default function CalendarEventModal(props: any) {
         const response: Status = await optOutForDinner(user.email, date.toLocaleDateString("en-GB"));
         setOutLoading(false);
 
-        handleResponse(response);
+        handleResponse(response, false);
     }
 
-    function handleResponse(response: Status): void {
+    function handleResponse(response: Status, attending: boolean): void {
         if (!response.success) {
             Alert.alert("Error", "There was an error processing this request. Please try again later.");
             return;
@@ -43,6 +43,10 @@ export default function CalendarEventModal(props: any) {
 
         Alert.alert("Success", "Your response has been recorded.");
         setVisible(false);
+        
+        if (props.callback) {
+            props.callback(attending);
+        }
     }
 
     return (

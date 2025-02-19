@@ -13,7 +13,7 @@ const RED = '#cb4038';
 
 export default function CalendarScreen(): ReactElement {
 
-    const [user, setUser] = useContext(UserContext) as UserContextType;
+    const [user] = useContext(UserContext) as UserContextType;
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [attendanceDates, setAttendanceDates] = useState<any[]>([]);
     const [attendanceColors, setAttendanceColors] = useState<Map<string, string>>(new Map());
@@ -69,7 +69,19 @@ export default function CalendarScreen(): ReactElement {
     function onCalendarDayPress(dateId: string): void {
         setSelectedDate(dateId);
         setModalOpen(true);
-        console.log(attendanceDates);
+    }
+
+    function addNewEventToCalendar(attending: boolean): void {
+        const dates = [...attendanceDates];
+        const colors = new Map(attendanceColors);
+        dates.push({
+            startId: selectedDate,
+            endId: selectedDate
+        });
+        colors.set(selectedDate, attending ? GREEN : RED);
+
+        setAttendanceColors(colors);
+        setAttendanceDates(dates);
     }
 
     const calendarTheme: CalendarTheme = {
@@ -129,6 +141,7 @@ export default function CalendarScreen(): ReactElement {
             <CalendarEventModal
                 visible={[modalOpen, setModalOpen]}
                 date={selectedDate}
+                callback={addNewEventToCalendar}
             />
             <GreenOverlay
                 height={150}
