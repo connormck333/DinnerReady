@@ -32,7 +32,7 @@ interface QueryResponse {
 interface QueryResponseExists {
     status: QueryStatus,
     data?: any,
-    exists: boolean
+    exists?: boolean
 }
 
 interface Dinner {
@@ -45,13 +45,13 @@ interface Dinner {
 }
 
 interface DinnerStatus {
-    dinner: Dinner,
+    dinner: Dinner | undefined,
     attendance: Attendee[]
 }
 
 interface Attendee {
     user: User,
-    attending: boolean
+    attending: boolean | undefined
 }
 
 export {

@@ -76,9 +76,9 @@ const getDinnerDetails = onRequest(async (req: Request, res: Response): Promise<
         return;
     }
 
-    const body: any = req.body;
     const token: string | undefined = req.headers.authorization;
-    const userEmail: string = body.email.toLowerCase();
+    let userEmail: string = req.query.email as string;
+    userEmail = userEmail.toLowerCase();
     if (!(await authenticateUserToken(token, userEmail))) {
         res.status(UNAUTHORISED_CODE).send(UNAUTHORISED_MESSAGE);
         return;
@@ -90,10 +90,10 @@ const getDinnerDetails = onRequest(async (req: Request, res: Response): Promise<
         return;
     }
 
-    const familyId: string = familyIdResponse.data.familyId;
-    const dinnerId: string = body.dinnerId;
+    const familyId: string = familyIdResponse.data;
+    const dinnerDate: string = req.query.dinnerDate as string;
 
-    const queryResponse: QueryResponse = await getDinner(familyId, dinnerId);
+    const queryResponse: QueryResponse = await getDinner(familyId, dinnerDate);
     if (queryResponse.status === QueryStatus.FAILURE) {
         res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
         return;
@@ -187,16 +187,19 @@ async function registerAttendanceForDinner(userEmail: string, body: any, attendi
     if (familyIdResponse.status === QueryStatus.FAILURE) return false;
 
     const familyId: string = familyIdResponse.data;
-    const dinnerId: string | null = body?.dinnerId;
+    let dinnerId: string | null = body?.dinnerId;
     const date: string = body?.date;
 
     // Check if dinnerId exists
-    const response: QueryResponse = await doesDinnerExist(familyId, date);
+    const response: QueryResponseExists = await doesDinnerExist(familyId, date);
     if (response.status == QueryStatus.FAILURE) {
         return false;
     }
 
-    const dinnerExists: boolean = response.data.exists;
+    const dinnerExists: boolean = response.exists as boolean;
+    if (dinnerExists && !dinnerId) {
+        dinnerId = response.data;
+    }
 
     let success: boolean;
     if (dinnerId === null || !dinnerExists) {

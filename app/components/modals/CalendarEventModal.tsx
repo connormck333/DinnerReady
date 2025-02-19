@@ -20,8 +20,8 @@ export default function CalendarEventModal(props: any) {
 
         setInLoading(true);
         const response: Status = await optInForDinner(user.email, date.toLocaleDateString("en-GB"));
-        setOutLoading(false);
-        
+        setInLoading(false);
+
         handleResponse(response);
     }
 

@@ -59,9 +59,9 @@ async function sendGetRequest(endpoint: string, authToken: string, params: GetPa
 }
 
 function formatParams(params: GetParam[]): string {
-    let query = "";
+    let query = "?";
     for (let param of params) {
-        query += "?" + param.key + "=" + encodeURIComponent(param.value);
+        query += "&" + param.key + "=" + encodeURIComponent(param.value);
     }
 
     return query;

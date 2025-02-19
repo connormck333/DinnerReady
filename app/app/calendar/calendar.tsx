@@ -8,11 +8,15 @@ import { Status, UserContextType } from '@/methods/utils/interfaces';
 import { getUserDinnerAttendances } from '@/methods/dinnerManagement/getUserDinnerAttendances';
 import UserContext from '@/methods/context/userContext';
 
+const GREEN = '#23da02';
+const RED = '#cb4038';
+
 export default function CalendarScreen(): ReactElement {
 
     const [user, setUser] = useContext(UserContext) as UserContextType;
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [attendanceDates, setAttendanceDates] = useState<any[]>([]);
+    const [attendanceColors, setAttendanceColors] = useState<Map<string, string>>(new Map());
     const [selectedMonth, _setSelectedMonth] = useState<string>(toDateId(currentDate));
     const [modalOpen, setModalOpen] = useState<boolean>(false);
     const [selectedDate, setSelectedDate] = useState<string>("");
@@ -30,16 +34,19 @@ export default function CalendarScreen(): ReactElement {
             return;
         }
 
-        const coloredDates: any[] = [];
+        const dates: any[] = [];
+        const colors: Map<string, string> = new Map();
         for (let date of response.response) {
             const readableDateString: string = date.date.split("/").reverse().join("-");
-            coloredDates.push({
+            dates.push({
                 startId: readableDateString,
                 endId: readableDateString
             });
+            colors.set(readableDateString, date.attending ? GREEN : RED);
         }
 
-        setAttendanceDates(coloredDates);
+        setAttendanceColors(colors);
+        setAttendanceDates(dates);
     }
 
     function setSelectedMonth(date: Date): void {
@@ -62,7 +69,60 @@ export default function CalendarScreen(): ReactElement {
     function onCalendarDayPress(dateId: string): void {
         setSelectedDate(dateId);
         setModalOpen(true);
+        console.log(attendanceDates);
     }
+
+    const calendarTheme: CalendarTheme = {
+        rowMonth: {
+            container: {
+                height: 40
+            },
+            content: {
+                fontSize: 22,
+                fontWeight: '500',
+            }
+        },
+        rowWeek: {
+            container: {
+                height: 40
+            }
+        },
+        itemWeekName: {
+            content: {
+                fontSize: 18,
+                fontWeight: '500'
+            }
+        },
+        
+        itemDay: {
+            idle: ({ id }) => ({
+                container: {
+                    backgroundColor: attendanceColors.get(id) || '#fff'
+                },
+                content: {
+                    fontSize: 16
+                }
+            }),
+            today: () => ({
+                container: {
+                    backgroundColor: "#1bb100"
+                },
+                content: {
+                    color: "#000",
+                    fontSize: 16
+                }
+            }),
+            active: ({ id }) => ({
+                container: {
+                    backgroundColor: attendanceColors.get(id) || '#fff'
+                },
+                content: {
+                    color: "#000",
+                    fontSize: 16
+                }
+            })
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -158,56 +218,3 @@ const styles = StyleSheet.create({
         fontWeight: '500'
     },
 });
-
-const calendarTheme: CalendarTheme = {
-    rowMonth: {
-        container: {
-            height: 40
-        },
-        content: {
-            fontSize: 22,
-            fontWeight: '500',
-        }
-    },
-    rowWeek: {
-        container: {
-            height: 40
-        }
-    },
-    itemWeekName: {
-        content: {
-            fontSize: 18,
-            fontWeight: '500'
-        }
-    },
-    
-    itemDay: {
-        idle: ({ isPressed }) => ({
-            container: {
-                backgroundColor: isPressed ? "#eee" : "transparent"
-            },
-            content: {
-                color: "#444",
-                fontSize: 18
-            },
-        }),
-        today: () => ({
-            container: {
-                backgroundColor: "#1bb100"
-            },
-            content: {
-                color: "#000",
-                fontSize: 16
-            }
-        }),
-        active: ({  }) => ({
-            container: {
-                backgroundColor: "red"
-            },
-            content: {
-                color: "#000",
-                fontSize: 16
-            }
-        })
-    }
-};

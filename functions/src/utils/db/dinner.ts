@@ -1,5 +1,5 @@
 import { CollectionReference, DocumentReference, DocumentSnapshot, QuerySnapshot } from "firebase-admin/firestore";
-import { Attendee, Dinner, DinnerStatus, QueryResponse, User } from "../../types/interfaces";
+import { Attendee, Dinner, DinnerStatus, QueryResponse, QueryResponseExists, User } from "../../types/interfaces";
 import { db } from "../admin";
 import QueryStatus from "../../types/query_status";
 import { getFamilyMembers } from "./families";
@@ -30,30 +30,34 @@ async function createNewDinner(familyId: string, dinnerData: Dinner): Promise<Qu
     }
 }
 
-async function getDinner(familyId: string, dinnerId: string): Promise<QueryResponse> {
-    const ref: DocumentReference = db
+async function getDinner(familyId: string, dinnerDate: string): Promise<QueryResponse> {
+    const ref: CollectionReference = db
         .collection("families")
         .doc(familyId)
-        .collection("dinners")
-        .doc(dinnerId);
+        .collection("dinners");
 
-    let dinnerData: Dinner;
+    let dinnerData: Dinner | undefined;
     try {
-        const data: DocumentSnapshot = await ref.get();
-        dinnerData = {
-            dinnerId: dinnerId,
-            announcedAtTimestamp: data.data()?.announcedAtTimestamp,
-            startsAtTimestamp: data.data()?.startsAtTimestamp,
-            endsAtTimestamp: data.data()?.endsAtTimestamp,
-            description: data.data()?.description,
-            date: data.data()?.date
+        const snapshot: QuerySnapshot = await ref.where("date", "==", dinnerDate).get();
+        if (snapshot.docs.length !== 0) {
+            const data = snapshot.docs[0];
+            dinnerData = {
+                dinnerId: data.id,
+                announcedAtTimestamp: data.data()?.announcedAtTimestamp,
+                startsAtTimestamp: data.data()?.startsAtTimestamp,
+                endsAtTimestamp: data.data()?.endsAtTimestamp,
+                description: data.data()?.description,
+                date: data.data()?.date
+            }
         }
     } catch (error) {
+        console.log("Could not find");
         return { status: QueryStatus.FAILURE };
     }
 
     const membersResponse: QueryResponse = await getFamilyMembers(familyId, undefined);
     if (membersResponse.status === QueryStatus.FAILURE) {
+        console.log("Could not get family")
         return { status: QueryStatus.FAILURE };
     }
 
@@ -62,13 +66,21 @@ async function getDinner(familyId: string, dinnerId: string): Promise<QueryRespo
     try {
         for (let user of familyMembers) {
             if (user.email === undefined) continue;
-            const attendingStatus: boolean = await getAttendanceForDinner(user.email, familyId, dinnerId);
-            attendees.push({
-                user: user,
-                attending: attendingStatus
-            });
+            if (dinnerData !== undefined) {
+                const attendingStatus: boolean = await getAttendanceForDinner(user.email, familyId, dinnerData.dinnerId as string);
+                attendees.push({
+                    user: user,
+                    attending: attendingStatus
+                });
+            } else {
+                attendees.push({
+                    user: user,
+                    attending: undefined
+                })
+            }
         }
     } catch (error) {
+        console.log("could not get dinner attendance");
         return { status: QueryStatus.FAILURE };
     }
 
@@ -139,7 +151,7 @@ async function getAttendanceForDinner(userId: string, familyId: string, dinnerId
     }
 }
 
-async function doesDinnerExist(familyId: string, date: string): Promise<QueryResponse> {
+async function doesDinnerExist(familyId: string, date: string): Promise<QueryResponseExists> {
     const ref: CollectionReference = db
         .collection("families")
         .doc(familyId)
@@ -149,13 +161,11 @@ async function doesDinnerExist(familyId: string, date: string): Promise<QueryRes
         const response: QuerySnapshot = await ref.where("date", "==", date).get();
         return {
             status: QueryStatus.SUCCESS,
-            data: {
-                exists: response.docs.length > 0,
-                dinnerId: response.docs.length > 0 ? response.docs[0].id : null
-            }
+            data: response.docs.length > 0 ? response.docs[0].id : null,
+            exists: response.docs.length > 0
         };
     } catch (error) {
-        return { status: QueryStatus.FAILURE };
+        return { status: QueryStatus.FAILURE, exists: false };
     }
 }
 

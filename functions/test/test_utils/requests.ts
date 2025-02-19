@@ -37,9 +37,9 @@ async function sendPutRequest(path: string, body: any, authToken: string): Promi
 }
 
 function formatParams(params: GetParam[]): string {
-    let query = "";
+    let query = "?";
     for (let param of params) {
-        query += "?" + param.key + "=" + encodeURIComponent(param.value);
+        query += "&" + param.key + "=" + encodeURIComponent(param.value);
     }
 
     return query;
