@@ -33,7 +33,7 @@ export default function ModalContainer(props: any): ReactElement {
                 >
                     <View
                         onLayout={setContainerPos}
-                        style={styles.container}
+                        style={[styles.container, props.containerStyle]}
                     >
                         { props.children }
                     </View>

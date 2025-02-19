@@ -15,7 +15,10 @@ export default function Input(props: any): ReactElement {
                 value={input}
                 onChangeText={setInput}
                 placeholder={props.placeholder}
-                style={[styles.input, styles.shadow]}
+                style={[styles.input, styles.shadow, props.style, {
+                    height: props.large ? 200 : 50
+                }]}
+                multiline={props.large}
                 textContentType={props.type}
                 secureTextEntry={props.type === "password"}
                 autoComplete={props.autoComplete}
@@ -31,7 +34,6 @@ const styles = StyleSheet.create({
     },
     input: {
         width: '100%',
-        height: 50,
         marginTop: 3,
         backgroundColor: '#fff',
         borderWidth: 1,

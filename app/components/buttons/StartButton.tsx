@@ -5,25 +5,38 @@ import UserContext from "@/methods/context/userContext";
 import { UserContextType } from "@/methods/utils/interfaces";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import CalendarEventModal from "../modals/CalendarEventModal";
+import StartDinnerModal from "../modals/StartDinnerModal";
 
 export default function StartButton(props: any): ReactElement {
 
     const [user] = useContext(UserContext) as UserContextType;
-    const [modalOpen, setModalOpen] = useState<boolean>(false);
+    const [calendarEventModalOpen, setCalendarEventModalOpen] = useState<boolean>(false);
+    const [startDinnerModalOpen, setStartDinnerModalOpen] = useState<boolean>(false);
+
+    function openModal(): void {
+        if (user.admin) {
+            setStartDinnerModalOpen(true);
+        } else {
+            setCalendarEventModalOpen(true);
+        }
+    }
 
     return (
         <View style={props.containerStyle}>
             <CalendarEventModal
-                visible={[modalOpen, setModalOpen]}
+                visible={[calendarEventModalOpen, setCalendarEventModalOpen]}
                 date={new Date(Date.now())}
                 callback={props.callback}
+            />
+            <StartDinnerModal
+                visible={[startDinnerModalOpen, setStartDinnerModalOpen]}
             />
             <View style={[styles.largeCircle, styles.center]}>
                 <View style={[styles.middleCircle, styles.center]}>
                     <TouchableOpacity
                         style={[styles.smallCircle, styles.center]}
                         activeOpacity={0.6}
-                        onPress={() => setModalOpen(true)}
+                        onPress={openModal}
                     >
                         { user.admin ?
                             <View style={styles.center}>
