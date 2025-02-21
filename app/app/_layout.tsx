@@ -1,5 +1,5 @@
 import { ReactElement, useState, useEffect } from "react";
-import { StyleSheet, Dimensions, View } from "react-native";
+import { StyleSheet, Dimensions, View, StyleProp, ViewStyle } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import RegistrationStack from "./registration/navigator";
@@ -11,6 +11,7 @@ import { Status, User, UserContextType } from "@/methods/utils/interfaces";
 import { getUserDetails } from "@/methods/userManagement/getUserDetails";
 import UserContext from "@/methods/context/userContext";
 import { getFamilyMembersAvatars } from "@/methods/familyManagement/getFamilyMembersAvatars";
+import { getFocusedRouteNameFromRoute, Route } from "@react-navigation/native";
 
 const Tab = createBottomTabNavigator();
 const { width } = Dimensions.get("window");
@@ -80,13 +81,26 @@ export default function TabLayout(): ReactElement {
 }
 
 function TabNavigator(): ReactElement {
+
+    const tabHiddenScreens = ["change_password"];
+
+    function isTabVisible(route: Route<string>): StyleProp<ViewStyle> {
+        const routeName = getFocusedRouteNameFromRoute(route);
+    
+        if (routeName === undefined) {
+            return styles.tabBar
+        }
+    
+        return tabHiddenScreens.includes(routeName) ? styles.tabBarHidden : styles.tabBar
+    }
+
     return (
         <Tab.Navigator
-            screenOptions={{
-                tabBarStyle: styles.tabBar,
+            screenOptions={({ route }) => ({
+                tabBarStyle: isTabVisible(route),
                 tabBarLabelStyle: styles.tabBarLabel,
                 headerShown: false
-            }}
+            })}
         >
             <Tab.Screen
                 name='index'
@@ -122,6 +136,9 @@ const styles = StyleSheet.create({
         shadowOffset: { height: 4, width: 0 },
         shadowOpacity: 0.3,
         shadowRadius: 10
+    },
+    tabBarHidden: {
+        display: "none"
     },
     tabBarLabel: {
         fontSize: 14,

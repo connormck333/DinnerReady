@@ -5,7 +5,7 @@ import { GENERAL_ERROR_CODE, GENERAL_ERROR_MESSAGE, INVALID_REQUEST_CODE, INVALI
 import { authenticateUserToken } from "../utils/authorisation";
 import { getFamilyId, getUserData, isUserAdmin } from "../utils/db/account";
 import { Attendee, Dinner, QueryResponse, QueryResponseExists, User } from "../types/interfaces";
-import { createNewDinner, doesDinnerExist, getDinner, getUserAttendanceCalendar, setAttendanceForDinnerWithId, setAttendanceForDinnerWithoutId } from "../utils/db/dinner";
+import { createNewDinner, doesDinnerExist, getDinner, getUserAttendanceCalendar, setAnnouncedAtForDinner, setAttendanceForDinnerWithId, setAttendanceForDinnerWithoutId } from "../utils/db/dinner";
 import QueryStatus from "../types/query_status";
 
 const startDinner = onRequest(async (req: Request, res: Response): Promise<void> => {
@@ -40,21 +40,20 @@ const startDinner = onRequest(async (req: Request, res: Response): Promise<void>
         dinnerId: undefined,
         date: body.date,
         announcedAtTimestamp: Date.now(),
-        startsAtTimestamp: body.startsAtTimestamp,
-        endsAtTimestamp: body.endsAtTimestamp,
         description: body.description
     }
 
-    const dinnerExistsResponse: QueryResponse = await doesDinnerExist(userData.familyId, body.date);
+    const dinnerExistsResponse: QueryResponseExists = await doesDinnerExist(userData.familyId, body.date);
     if (dinnerExistsResponse.status == QueryStatus.FAILURE) {
         res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
         return;
     }
-    const dinnerExists: boolean = dinnerExistsResponse.data.exists;
+    const dinnerExists: boolean = dinnerExistsResponse.exists as boolean;
 
     let queryResponse: QueryResponse;
     if (dinnerExists) {
-        queryResponse = await getDinner(userData.familyId, dinnerExistsResponse.data.dinnerId);
+        queryResponse = await getDinner(userData.familyId, dinnerData.date);
+        await setAnnouncedAtForDinner(userData.familyId, queryResponse.data.dinner.dinnerId, dinnerData.announcedAtTimestamp)
     } else {
         queryResponse = await createNewDinner(userData.familyId, dinnerData);
     }

@@ -38,8 +38,6 @@ interface QueryResponseExists {
 interface Dinner {
     dinnerId: string | undefined,
     announcedAtTimestamp: number,
-    startsAtTimestamp: number,
-    endsAtTimestamp: number,
     description: string,
     date: string
 }

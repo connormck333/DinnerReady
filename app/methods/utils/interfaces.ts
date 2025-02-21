@@ -26,7 +26,7 @@ interface Family {
 
 interface Status {
     success: boolean,
-    response: any
+    response?: any
 }
 
 interface GetParam {

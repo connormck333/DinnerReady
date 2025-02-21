@@ -13,8 +13,6 @@ async function createNewDinner(familyId: string, dinnerData: Dinner): Promise<Qu
     try {
         const doc: DocumentReference = await ref.add({
             announcedAtTimestamp: dinnerData.announcedAtTimestamp,
-            startsAtTimestamp: dinnerData.startsAtTimestamp,
-            endsAtTimestamp: dinnerData.endsAtTimestamp,
             description: dinnerData.description,
             date: dinnerData.date
         });
@@ -44,8 +42,6 @@ async function getDinner(familyId: string, dinnerDate: string): Promise<QueryRes
             dinnerData = {
                 dinnerId: data.id,
                 announcedAtTimestamp: data.data()?.announcedAtTimestamp,
-                startsAtTimestamp: data.data()?.startsAtTimestamp,
-                endsAtTimestamp: data.data()?.endsAtTimestamp,
                 description: data.data()?.description,
                 date: data.data()?.date
             }
@@ -90,6 +86,24 @@ async function getDinner(familyId: string, dinnerDate: string): Promise<QueryRes
     }
 
     return { status: QueryStatus.SUCCESS, data: dinnerStatus };
+}
+
+async function setAnnouncedAtForDinner(familyId: string, dinnerId: string, announcedAt: number): Promise<boolean> {
+    const ref: DocumentReference = db
+        .collection("families")
+        .doc(familyId)
+        .collection("dinners")
+        .doc(dinnerId)
+
+    try {
+        await ref.set({
+            announcedAt: announcedAt
+        }, {merge: true});
+    } catch (error) {
+        return false;
+    }
+
+    return true;
 }
 
 async function setAttendanceForDinnerWithId(userId: string, familyId: string, dinnerId: string, attendingStatus: boolean): Promise<boolean> {
@@ -205,5 +219,6 @@ export {
     setAttendanceForDinnerWithoutId,
     getDinner,
     doesDinnerExist,
-    getUserAttendanceCalendar
+    getUserAttendanceCalendar,
+    setAnnouncedAtForDinner
 }

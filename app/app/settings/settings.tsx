@@ -5,13 +5,19 @@ import LoweringContainer from '@/components/animations/LoweringContainer';
 import SharedHeader from '@/components/SharedHeader';
 import { LowerContainerRef } from '@/methods/utils/interfaces';
 import { userLogout } from '@/methods/userManagement/logout';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 export default function SettingsScreen(props: any): ReactElement {
 
+    const { navigation } = props;
     const loweringContainerRef = useRef<LowerContainerRef>(null);
 
-    function goBack() {
+    function goBack(): void {
         loweringContainerRef.current?.closeScreen();
+    }
+
+    function changePassword(): void {
+        navigation.replace("change_password");
     }
 
     return (
@@ -26,6 +32,11 @@ export default function SettingsScreen(props: any): ReactElement {
                 />
 
                 <View style={styles.body}>
+                    <Option
+                        icon={<MaterialCommunityIcons name="account-key" size={25} color="black" />}
+                        text="Change Password"
+                        onPress={changePassword}
+                    />
                     <Option
                         icon={<MaterialIcons name="logout" size={25} color="black" />}
                         text="Log out"
@@ -68,7 +79,8 @@ const styles = StyleSheet.create({
         width: '100%',
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        marginBottom: 20
     },
     row: {
         flexDirection: 'row',
