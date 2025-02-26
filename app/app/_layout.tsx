@@ -82,7 +82,7 @@ export default function TabLayout(): ReactElement {
 
 function TabNavigator(): ReactElement {
 
-    const tabHiddenScreens = ["change_password", "edit_profile"];
+    const tabHiddenScreens = ["change_password", "edit_profile", "join_new_family"];
 
     function isTabVisible(route: Route<string>): StyleProp<ViewStyle> {
         const routeName = getFocusedRouteNameFromRoute(route);

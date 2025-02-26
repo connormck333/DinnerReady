@@ -5,6 +5,7 @@ import AccountScreen from './account';
 import SettingsScreen from '../settings/settings';
 import ChangePasswordScreen from '../settings/changePassword';
 import EditProfileScreen from '../settings/editProfile';
+import JoinNewFamilyScreen from '../settings/joinNewFamily';
 
 const Stack = createNativeStackNavigator();
 
@@ -44,6 +45,14 @@ export default function HomeStack(): ReactElement {
             <Stack.Screen
                 name="edit_profile"
                 component={EditProfileScreen}
+                options={{
+                    presentation: "card",
+                    animation: "default"
+                }}
+            />
+            <Stack.Screen
+                name="join_new_family"
+                component={JoinNewFamilyScreen}
                 options={{
                     presentation: "card",
                     animation: "default"

@@ -160,6 +160,34 @@ async function joinFamilyByJoinCode(userId: string, code: string): Promise<boole
     return success;
 }
 
+async function leaveFamily(userId: string): Promise<boolean> {
+    const response: QueryResponseExists = await getUserData(userId);
+    if (response.status === QueryStatus.FAILURE || !response.exists || response.data?.familyId == null) {
+        return false;
+    }
+
+    const userData: User = response.data;
+    console.log(userData);
+
+    try {
+        const familyRef: DocumentReference = db.collection("families").doc(userData.familyId as string);
+        await familyRef.collection("members").doc(userId).delete();
+        await db.collection("users").doc(userId).set({
+            familyId: null
+        }, { merge: true });
+    } catch (error) {
+        console.log(error);
+        return false;
+    }
+
+    return true;
+}
+
+async function doesJoinCodeExist(code: string): Promise<boolean> {
+    const codeDoc: DocumentSnapshot = await db.collection("joinCodes").doc(code).get();
+    return codeDoc.exists;
+}
+
 export {
     addUserToFamily,
     getFamilyMembers,
@@ -167,5 +195,7 @@ export {
     createNewFamily,
     getFamilyCreator,
     createFamilyJoinCode,
-    joinFamilyByJoinCode
+    joinFamilyByJoinCode,
+    leaveFamily,
+    doesJoinCodeExist
 }

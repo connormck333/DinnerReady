@@ -20,6 +20,10 @@ export default function SettingsScreen(props: any): ReactElement {
         navigation.replace("edit_profile");
     }
 
+    function joinNewFamily(): void {
+        navigation.replace("join_new_family");
+    }
+
     function changePassword(): void {
         navigation.replace("change_password");
     }
@@ -40,6 +44,11 @@ export default function SettingsScreen(props: any): ReactElement {
                         icon={<MaterialCommunityIcons name="account" size={25} color="black" />}
                         text="Edit Profile"
                         onPress={editProfile}
+                    />
+                    <Option
+                        icon={<MaterialCommunityIcons name="account-multiple" size={25} color="black" />}
+                        text="Join New Family"
+                        onPress={joinNewFamily}
                     />
                     <Option
                         icon={<MaterialCommunityIcons name="account-key" size={25} color="black" />}
