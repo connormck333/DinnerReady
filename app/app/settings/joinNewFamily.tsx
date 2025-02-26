@@ -2,15 +2,17 @@ import Form from "@/components/form/Form";
 import Input from "@/components/form/Input";
 import SharedHeader from "@/components/SharedHeader";
 import UserContext from "@/methods/context/userContext";
+import UserRefreshContext from "@/methods/context/userRefreshContext";
 import { joinNewFamilyByCode } from "@/methods/familyManagement/joinNewFamilyByCode";
-import { Status, UserContextType } from "@/methods/utils/interfaces";
+import { RefreshContextType, Status, UserContextType } from "@/methods/utils/interfaces";
 import { ReactElement, useContext, useState } from "react";
 import { View, StyleSheet, Text, Alert } from "react-native";
 
 export default function JoinNewFamilyScreen(props: any): ReactElement {
 
     const { navigation } = props;
-    const [user] = useContext(UserContext) as UserContextType;
+    const [userRefresher, setUserRefresher] = useContext(UserRefreshContext) as RefreshContextType;
+    const [user, setUser] = useContext(UserContext) as UserContextType;
     const [code, setCode] = useState<string>("");
 
     function goBack(): void {
@@ -31,6 +33,7 @@ export default function JoinNewFamilyScreen(props: any): ReactElement {
         }
 
         Alert.alert("Success", "You have joined a new family account!");
+        setUserRefresher(!userRefresher);
     }
 
     return (

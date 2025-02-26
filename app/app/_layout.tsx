@@ -12,39 +12,54 @@ import { getUserDetails } from "@/methods/userManagement/getUserDetails";
 import UserContext from "@/methods/context/userContext";
 import { getFamilyMembersAvatars } from "@/methods/familyManagement/getFamilyMembersAvatars";
 import { getFocusedRouteNameFromRoute, Route } from "@react-navigation/native";
+import RefreshContext from "@/methods/context/refreshContext";
+import UserRefreshContext from "@/methods/context/userRefreshContext";
 
 const Tab = createBottomTabNavigator();
 const { width } = Dimensions.get("window");
 
 export default function TabLayout(): ReactElement {
 
+    const [firstRender, setFirstRender] = useState<boolean>(true);
+    const [refresher, setRefresher] = useState<boolean>(false);
+    const [userRefresher, setUserRefresher] = useState<boolean>(false);
     const [signedIn, setSignedIn] = useState<boolean | undefined>(undefined);
     const [signedInUser, setSignedInUser] = useState<User | undefined>(undefined);
 
     useEffect(() => {
         (() => {
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    const authToken = await user.getIdToken();
-                    const response: Status = await getUserDetails(user.email as string, authToken);
-        
-                    setSignedIn(true);
-                    if (response.success) {
-                        const userDetails: User = response.response;
-                        setSignedInUser(userDetails);
-                        loadAvatars(userDetails);
-                        return;
+            if (firstRender) {
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        await loadUserDetails();
+                    } else {
+                        setSignedIn(false);
+                        setSignedInUser(undefined);
                     }
-                } else {
+                }, () => {
                     setSignedIn(false);
                     setSignedInUser(undefined);
-                }
-            }, () => {
-                setSignedIn(false);
-                setSignedInUser(undefined);
-            });
+                });
+
+                setFirstRender(false);
+            } else {
+                loadUserDetails();
+            }
         })();
-    }, []);
+    }, [userRefresher]);
+
+    async function loadUserDetails(): Promise<void> {
+        const authToken: string = await auth.currentUser?.getIdToken() as string;
+        const response: Status = await getUserDetails(auth.currentUser?.email as string, authToken);
+
+        setSignedIn(true);
+        if (response.success) {
+            const userDetails: User = response.response;
+            setSignedInUser(userDetails);
+            loadAvatars(userDetails);
+            return;
+        }
+    }
 
     async function loadAvatars(userDetails: User): Promise<void> {
         if (userDetails.familyData) {
@@ -61,22 +76,26 @@ export default function TabLayout(): ReactElement {
     }
 
     return (
-        <UserContext.Provider value={[signedInUser, setSignedInUser] as UserContextType}>
-            { signedIn === undefined ?
-                <View />
-                :
-                <>
-                    {!signedIn || (signedIn && !signedInUser?.hasCompletedOnboarding) ?
-                        <RegistrationStack
-                            signedIn={[signedIn, setSignedIn]}
-                            hasCompletedOnboarding={signedInUser?.hasCompletedOnboarding}
-                        />
+        <RefreshContext.Provider value={[refresher, setRefresher]}>
+            <UserRefreshContext.Provider value={[userRefresher, setUserRefresher]}>
+                <UserContext.Provider value={[signedInUser, setSignedInUser] as UserContextType}>
+                    { signedIn === undefined ?
+                        <View />
                         :
-                        <TabNavigator />
+                        <>
+                            {!signedIn || (signedIn && !signedInUser?.hasCompletedOnboarding) ?
+                                <RegistrationStack
+                                    signedIn={signedIn}
+                                    hasCompletedOnboarding={signedInUser?.hasCompletedOnboarding}
+                                />
+                                :
+                                <TabNavigator />
+                            }
+                        </>
                     }
-                </>
-            }
-        </UserContext.Provider>
+                </UserContext.Provider>
+            </UserRefreshContext.Provider>
+        </RefreshContext.Provider>
     );
 }
 

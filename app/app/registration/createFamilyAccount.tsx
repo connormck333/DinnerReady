@@ -3,19 +3,19 @@ import Form from "@/components/form/Form";
 import Input from "@/components/form/Input";
 import RegistrationHeader from "@/components/registration/RegistrationHeader";
 import UserContext from "@/methods/context/userContext";
-import { auth } from "@/methods/firebase";
+import UserRefreshContext from "@/methods/context/userRefreshContext";
 import { createFamilyAccount } from "@/methods/registration/createFamily";
 import { saveFamilyAvatar } from "@/methods/registration/saveAvatar";
-import { getUserDetails } from "@/methods/userManagement/getUserDetails";
 import { isValidName } from "@/methods/utils/inputValidation";
-import { Status, User, UserContextType } from "@/methods/utils/interfaces";
+import { RefreshContextType, Status, UserContextType } from "@/methods/utils/interfaces";
 import { ReactElement, useContext, useState } from "react";
 import { View, StyleSheet, Alert } from "react-native";
 
 export default function CreateFamilyAccountScreen(props: any): ReactElement {
 
-    const { navigation, route, setSignedIn } = props;
-    const [user, setUser]: UserContextType = useContext(UserContext) as UserContextType;
+    const { navigation, route } = props;
+    const [userRefresher, setUserRefresher] = useContext(UserRefreshContext) as RefreshContextType;
+    const [user]: UserContextType = useContext(UserContext) as UserContextType;
     const [avatar, setAvatar] = useState<string | undefined>(undefined);
     const [familyName, setFamilyName] = useState<string>("");
 
@@ -39,11 +39,7 @@ export default function CreateFamilyAccountScreen(props: any): ReactElement {
             await saveFamilyAvatar(avatar, familyId);
         }
 
-        setUser({
-            ...user,
-            hasCompletedOnboarding: true
-        });
-        setSignedIn(true);
+        setUserRefresher(!userRefresher);
     }
 
     function joinFamily(): void {

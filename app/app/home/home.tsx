@@ -6,14 +6,16 @@ import HeaderButton from "../../components/buttons/HeaderButton";
 import StartButton from "../../components/buttons/StartButton";
 import ResponseBox from "../../components/boxes/ResponseBox";
 import { ReactElement, useContext, useEffect, useState } from "react";
-import { Status, UserContextType } from "@/methods/utils/interfaces";
+import { RefreshContextType, Status, UserContextType } from "@/methods/utils/interfaces";
 import { getCurrentDinner } from "@/methods/dinnerManagement/getCurrentDinner";
 import UserContext from "@/methods/context/userContext";
 import { getAvatarUrl } from "@/methods/userManagement/getAvatarUrl";
+import RefreshContext from "@/methods/context/refreshContext";
 
 export default function HomeScreen(props: any): ReactElement {
 
     const { navigation } = props;
+    const [refresher, setRefresher] = useContext(RefreshContext) as RefreshContextType;
     const [user, setUser] = useContext(UserContext) as UserContextType;
     const [currentDinner, setCurrentDinner] = useState<any>({attendance: []});
     const [isUserAttending, setUserAttending] = useState<boolean | undefined>(undefined);
@@ -26,9 +28,10 @@ export default function HomeScreen(props: any): ReactElement {
         (() => {
             loadCurrentDinner();
         })();
-    }, []);
+    }, [user, refresher]);
 
     async function loadCurrentDinner(): Promise<void> {
+        setLoading(true);
         const response: Status = await getCurrentDinner(user.email);
         if (!response.success) return;
 

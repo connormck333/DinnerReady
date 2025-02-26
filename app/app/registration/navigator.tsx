@@ -12,7 +12,7 @@ const Stack = createNativeStackNavigator();
 export default function RegistrationStack(props: any): ReactElement {
 
     const { hasCompletedOnboarding } = props;
-    const [signedIn, setSignedIn] = props.signedIn;
+    const signedIn = props.signedIn;
 
     return (
         <Stack.Navigator
@@ -25,10 +25,10 @@ export default function RegistrationStack(props: any): ReactElement {
             <Stack.Screen name="login" component={LoginScreen} />
             <Stack.Screen name="createAccount" component={CreateAccountScreen} />
             <Stack.Screen name="createFamily">
-                { props => <CreateFamilyAccountScreen {...props} setSignedIn={setSignedIn} /> }
+                { props => <CreateFamilyAccountScreen {...props} /> }
             </Stack.Screen>
             <Stack.Screen name="joinFamily">
-                { props => <JoinFamilyAccountScreen {...props} setSignedIn={setSignedIn} /> }
+                { props => <JoinFamilyAccountScreen {...props} /> }
             </Stack.Screen>
             <Stack.Screen name="avatar" component={UserAvatarScreen} />
         </Stack.Navigator>

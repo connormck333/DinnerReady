@@ -1,5 +1,5 @@
 import { ReactElement, useContext, useEffect, useRef, useState } from "react";
-import { View, StyleSheet, Text, Dimensions, Image, FlatList, TouchableOpacity, Animated, Alert } from "react-native";
+import { View, StyleSheet, Text, Dimensions, Image, FlatList, TouchableOpacity, Animated, Alert, ActivityIndicator } from "react-native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import LoweringContainer from "@/components/animations/LoweringContainer";
 import { LowerContainerRef, Status, UserContextType } from "@/methods/utils/interfaces";
@@ -74,18 +74,28 @@ export default function AccountScreen(): ReactElement {
 
 function Footer(props: any): ReactElement {
 
+    const [loading, setLoading] = useState<boolean>(false);
+
+    async function onPress(): Promise<void> {
+        setLoading(true);
+        await props.createNewJoinCode();
+        setLoading(false);
+    }
+
     return (
         <View style={styles.footer}>
             <TouchableOpacity
-                onPress={props.createNewJoinCode}
+                onPress={onPress}
                 style={[styles.btn, styles.inviteBtn, styles.center]}
             >
-                <MaterialIcons name="mail" size={24} color="#fff" />
-                <Text style={styles.btnText}>Invite</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.btn, styles.manageBtn, styles.center]}>
-                <MaterialIcons name="settings" size={24} color="#fff" />
-                <Text style={styles.btnText}>Settings</Text>
+                { loading ?
+                    <ActivityIndicator color="#fff" size="small" />
+                    :
+                    <View style={styles.btnInner}>
+                        <MaterialIcons name="mail" size={24} color="#fff" />
+                        <Text style={styles.btnText}>Invite</Text>
+                    </View>
+                }
             </TouchableOpacity>
         </View>
     );
@@ -163,18 +173,15 @@ const styles = StyleSheet.create({
         shadowOffset: { height: 4, width: 0 },
         shadowOpacity: 0.1,
         shadowRadius: 5,
-        borderWidth: 2,
-        flexDirection: 'row',
-        alignItems: 'center'
+        borderWidth: 2
     },
     inviteBtn: {
         backgroundColor: '#005C00',
         borderColor: '#003c00'
     },
-    manageBtn: {
-        marginTop: 15,
-        backgroundColor: '#0B9212',
-        borderColor: '#0c7f13'
+    btnInner: {
+        flexDirection: 'row',
+        alignItems: 'center'
     },
     btnText: {
         fontSize: 20,

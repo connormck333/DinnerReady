@@ -4,15 +4,17 @@ import { Calendar, toDateId, CalendarTheme } from "@marceloterreiro/flash-calend
 import GreenOverlay from '@/components/GreenOverlay';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import CalendarEventModal from '@/components/modals/CalendarEventModal';
-import { Status, UserContextType } from '@/methods/utils/interfaces';
+import { RefreshContextType, Status, UserContextType } from '@/methods/utils/interfaces';
 import { getUserDinnerAttendances } from '@/methods/dinnerManagement/getUserDinnerAttendances';
 import UserContext from '@/methods/context/userContext';
+import RefreshContext from '@/methods/context/refreshContext';
 
 const GREEN = '#23da02';
 const RED = '#cb4038';
 
 export default function CalendarScreen(): ReactElement {
 
+    const [refresher, setRefresher] = useContext(RefreshContext) as RefreshContextType;
     const [user] = useContext(UserContext) as UserContextType;
     const [currentDate, setCurrentDate] = useState<Date>(new Date());
     const [attendanceDates, setAttendanceDates] = useState<any[]>([]);
@@ -83,6 +85,7 @@ export default function CalendarScreen(): ReactElement {
 
         setAttendanceColors(colors);
         setAttendanceDates(dates);
+        setRefresher(!refresher);
     }
 
     const calendarTheme: CalendarTheme = {

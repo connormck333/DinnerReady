@@ -38,6 +38,7 @@ interface LowerContainerRef {
     closeScreen: () => void;
 }
 
+type RefreshContextType = [boolean, Dispatch<SetStateAction<boolean>>];
 type UserContextType = [User, Dispatch<SetStateAction<User>>];
 
 export {
@@ -47,5 +48,6 @@ export {
     LowerContainerRef,
     User,
     Family,
+    RefreshContextType,
     UserContextType
 }
