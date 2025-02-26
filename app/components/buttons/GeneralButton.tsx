@@ -7,7 +7,7 @@ export default function GeneralButton(props: any): ReactElement {
         <TouchableOpacity
             onPress={props.onPress}
             style={[styles.container, props.style]}
-            disabled={props.loading}
+            disabled={props.loading || props.disabled}
         >
             { props.loading ?
                 <ActivityIndicator color="#fff" size="small" />

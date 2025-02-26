@@ -2,24 +2,34 @@ import { ReactElement, useContext, useEffect, useRef, useState } from "react";
 import { View, StyleSheet, Text, Dimensions, Image, FlatList, TouchableOpacity, Animated, Alert, ActivityIndicator } from "react-native";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import LoweringContainer from "@/components/animations/LoweringContainer";
-import { LowerContainerRef, Status, UserContextType } from "@/methods/utils/interfaces";
+import { LowerContainerRef, Status, User, UserContextType } from "@/methods/utils/interfaces";
 import SharedHeader from "@/components/SharedHeader";
 import { createJoinCode } from "@/methods/familyManagement/createJoinCode";
 import UserContext from "@/methods/context/userContext";
 import JoinCodeModal from "@/components/modals/JoinCodeModal";
 import { DEFAULT_AVATAR_URL, getFamilyAvatarUrl } from "@/methods/userManagement/getAvatarUrl";
+import ManageMemberModal from "@/components/modals/ManageMemberModal";
 
 const { height } = Dimensions.get("window");
 
 export default function AccountScreen(): ReactElement {
 
-    const [user, setUser] = useContext(UserContext) as UserContextType;
+    const [user] = useContext(UserContext) as UserContextType;
     const [code, setCode] = useState<string>("");
     const [modalOpen, setModalOpen] = useState<boolean>(false);
+    const [manageModalOpen, setManageModalOpen] = useState<boolean>(false);
+    const [selectedUser, setSelectedUser] = useState<User | undefined>(undefined);
     const loweringContainerRef = useRef<LowerContainerRef>(null);
 
     function closeModal(): void {
         loweringContainerRef.current?.closeScreen();
+    }
+
+    function openManageModal(item: any): void {
+        if (user.email === item.email) return;
+
+        setSelectedUser(item);
+        setManageModalOpen(true);
     }
 
     async function createNewJoinCode(): Promise<void> {
@@ -39,6 +49,10 @@ export default function AccountScreen(): ReactElement {
                 visible={[modalOpen, setModalOpen]}
                 code={code}
             />
+            <ManageMemberModal
+                visible={[manageModalOpen, setManageModalOpen]}
+                selectedUser={selectedUser}
+            />
             <LoweringContainer
                 ref={loweringContainerRef}
                 style={styles.container}
@@ -54,16 +68,19 @@ export default function AccountScreen(): ReactElement {
                         />
                     }
                     renderItem={({ item, index }) => (
-                        <View style={[styles.item, {
-                            marginTop: index > 1 ? 20 : 0
-                        }]}>
+                        <TouchableOpacity
+                            onPress={() => openManageModal(item)}
+                            style={[styles.item, {
+                                marginTop: index > 1 ? 20 : 0
+                            }]}
+                        >
                             <Image
                                 source={{ uri: item.avatarUrl  }}
                                 style={styles.avatar}
                                 resizeMode="cover"
                             />
                             <Text style={styles.nameText}>{ item?.firstName } { item.lastName }</Text>
-                        </View>
+                        </TouchableOpacity>
                     )}
                     ListFooterComponent={user.admin ? <Footer createNewJoinCode={createNewJoinCode} /> : <View />}
                 />

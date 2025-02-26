@@ -1,6 +1,6 @@
 import { deleteUserAvatar, getUserInfo, removeAdminStatusFromFamilyMember, setUserAsFamilyAdmin, updateUserDetails } from "./src/triggers/account";
 import { getDinnerDetails, getUserDinnerAttendances, optInForDinner, optOutForDinner, startDinner } from "./src/triggers/dinner";
-import { createJoinCode, joinFamilyUsingCode, joinNewFamilyUsingCode } from "./src/triggers/families";
+import { createJoinCode, joinFamilyUsingCode, joinNewFamilyUsingCode, removeMemberFromFamily } from "./src/triggers/families";
 import { createUser, createFamilyAccount, joinFamilyAccountAsAdmin, joinFamilyAccountAsMember } from "./src/triggers/registration";
 
 module.exports = {
@@ -20,5 +20,6 @@ module.exports = {
     startDinner,
     deleteUserAvatar,
     updateUserDetails,
-    joinNewFamilyUsingCode
+    joinNewFamilyUsingCode,
+    removeMemberFromFamily
 };

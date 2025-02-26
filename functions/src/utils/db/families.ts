@@ -173,7 +173,8 @@ async function leaveFamily(userId: string): Promise<boolean> {
         const familyRef: DocumentReference = db.collection("families").doc(userData.familyId as string);
         await familyRef.collection("members").doc(userId).delete();
         await db.collection("users").doc(userId).set({
-            familyId: null
+            familyId: null,
+            admin: false
         }, { merge: true });
     } catch (error) {
         console.log(error);

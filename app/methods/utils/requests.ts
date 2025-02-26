@@ -79,6 +79,29 @@ async function sendDeleteRequest(endpoint: string, authToken: string, body: any)
     }
 }
 
+async function sendPutRequest(endpoint: string, authToken: string, body: any): Promise<Status> {
+    try {
+        const response = await fetch(URL + endpoint, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': authToken,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body)
+        });
+
+        if (response.status != 200) {
+            return { success: false };
+        }
+
+        return { success: true };
+
+    } catch (error: any) {
+        return { success: false };
+    }
+}
+
 function formatParams(params: GetParam[]): string {
     let query = "?";
     for (let param of params) {
@@ -91,5 +114,6 @@ function formatParams(params: GetParam[]): string {
 export {
     sendPostRequest,
     sendGetRequest,
-    sendDeleteRequest
+    sendDeleteRequest,
+    sendPutRequest
 }
