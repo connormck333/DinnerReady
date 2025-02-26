@@ -47,7 +47,7 @@ describe("Account unit tests", () => {
 
         expect(response.status).toBe(SUCCESS_CODE);
         expect(response.body).toHaveProperty("firstName", userInfo.firstName);
-        expect(response.body).toHaveProperty("surname", userInfo.surname);
+        expect(response.body).toHaveProperty("lastName", userInfo.surname);
     });
 
     test("Should set user as admin from an admin account", async () => {
@@ -106,12 +106,12 @@ describe("Account unit tests", () => {
 
         expect(response.status).toBe(SUCCESS_CODE);
         expect(response.body).toHaveProperty("firstName", userInfo.firstName);
-        expect(response.body).toHaveProperty("surname", userInfo.surname);
+        expect(response.body).toHaveProperty("lastName", userInfo.surname);
         expect(response.body).toHaveProperty("admin", userInfo.admin);
         expect(response.body.familyData).toHaveProperty("familyId", userInfo.familyId);
 
         expect(response.body.familyData.members[0]).toHaveProperty("firstName", ADMIN_ACCOUNT.firstName);
-        expect(response.body.familyData.members[0]).toHaveProperty("surname", ADMIN_ACCOUNT.surname);
+        expect(response.body.familyData.members[0]).toHaveProperty("lastName", ADMIN_ACCOUNT.surname);
         expect(response.body.familyData.members[0]).toHaveProperty("admin", true);
     });
 
