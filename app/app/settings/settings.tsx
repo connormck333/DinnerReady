@@ -16,6 +16,10 @@ export default function SettingsScreen(props: any): ReactElement {
         loweringContainerRef.current?.closeScreen();
     }
 
+    function editProfile(): void {
+        navigation.replace("edit_profile");
+    }
+
     function changePassword(): void {
         navigation.replace("change_password");
     }
@@ -32,6 +36,11 @@ export default function SettingsScreen(props: any): ReactElement {
                 />
 
                 <View style={styles.body}>
+                    <Option
+                        icon={<MaterialCommunityIcons name="account" size={25} color="black" />}
+                        text="Edit Profile"
+                        onPress={editProfile}
+                    />
                     <Option
                         icon={<MaterialCommunityIcons name="account-key" size={25} color="black" />}
                         text="Change Password"

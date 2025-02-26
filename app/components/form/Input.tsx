@@ -16,13 +16,15 @@ export default function Input(props: any): ReactElement {
                 onChangeText={setInput}
                 placeholder={props.placeholder}
                 style={[styles.input, styles.shadow, props.style, {
-                    height: props.large ? 200 : 50
+                    height: props.large ? 200 : 50,
+                    backgroundColor: props.disabled ? "#eee" : "#fff"
                 }]}
                 multiline={props.large}
                 textContentType={props.type}
                 secureTextEntry={props.type === "password"}
                 autoComplete={props.autoComplete}
                 autoCapitalize={props.type === "emailAddress" || props.type === "password" ? "none" : "sentences"}
+                editable={!props.disabled}
             />
         </View>
     );
@@ -35,7 +37,6 @@ const styles = StyleSheet.create({
     input: {
         width: '100%',
         marginTop: 3,
-        backgroundColor: '#fff',
         borderWidth: 1,
         borderColor: '#888',
         borderRadius: 8,

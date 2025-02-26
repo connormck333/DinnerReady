@@ -11,10 +11,10 @@ interface User {
     email: string,
     firstName: string,
     lastName: string,
-    familyId: string | undefined,
+    familyId?: string | undefined,
     familyData?: Family,
     avatarUrl?: string,
-    hasCompletedOnboarding: boolean,
+    hasCompletedOnboarding?: boolean,
     admin?: boolean
 }
 

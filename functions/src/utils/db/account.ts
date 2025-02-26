@@ -26,6 +26,21 @@ async function createNewUser(userEmail: string, firstName: string, surname: stri
     return true;
 }
 
+async function updateExistingUserDetails(userEmail: string, userDetails: User): Promise<boolean> {
+    const ref: CollectionReference = db.collection("users");
+    try {
+        await ref.doc(userEmail).set({
+            email: userEmail,
+            firstName: userDetails.firstName,
+            surname: userDetails.lastName
+        }, { merge: true });
+    } catch (error) {
+        return false;
+    }
+
+    return true;
+}
+
 async function getUserData(userId: string): Promise<QueryResponseExists> {
     try {
         const snapshot: DocumentSnapshot = await db.collection("users").doc(userId).get();
@@ -93,5 +108,6 @@ export {
     getUserData,
     isUserAdmin,
     isUserCreator,
-    getFamilyId
+    getFamilyId,
+    updateExistingUserDetails
 }

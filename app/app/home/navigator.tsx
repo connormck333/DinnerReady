@@ -4,6 +4,7 @@ import HomeScreen from './home';
 import AccountScreen from './account';
 import SettingsScreen from '../settings/settings';
 import ChangePasswordScreen from '../settings/changePassword';
+import EditProfileScreen from '../settings/editProfile';
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +36,14 @@ export default function HomeStack(): ReactElement {
             <Stack.Screen
                 name="change_password"
                 component={ChangePasswordScreen}
+                options={{
+                    presentation: "card",
+                    animation: "default"
+                }}
+            />
+            <Stack.Screen
+                name="edit_profile"
+                component={EditProfileScreen}
                 options={{
                     presentation: "card",
                     animation: "default"

@@ -14,7 +14,6 @@ export default function ChangePasswordScreen(props: any): ReactElement {
     const [currentPassword, setCurrentPassword] = useState<string>("");
     const [newPassword, setNewPassword] = useState<string>("");
     const [confirmPassword, setConfirmPassword] = useState<string>("");
-    const [loading, setLoading] = useState<boolean>(false);
 
     function goBack(): void {
         navigation.goBack();
@@ -26,11 +25,7 @@ export default function ChangePasswordScreen(props: any): ReactElement {
             return;
         }
 
-        setLoading(true);
-
         const response: Status = await changePassword(user.email, currentPassword, newPassword);
-
-        setLoading(false);
 
         if (!response.success) {
             Alert.alert("Error", "There was an error changing your password. Please try again later.");

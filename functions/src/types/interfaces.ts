@@ -18,9 +18,9 @@ interface Family {
 interface User {
     firstName: string,
     lastName: string,
-    familyId: string | undefined,
+    familyId?: string | undefined,
     email: string | undefined,
-    admin: boolean | undefined,
+    admin?: boolean | undefined,
     hasCompletedOnboarding?: boolean
 }
 

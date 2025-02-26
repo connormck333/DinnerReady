@@ -1,4 +1,4 @@
-import { getUserInfo, removeAdminStatusFromFamilyMember, setUserAsFamilyAdmin } from "./src/triggers/account";
+import { deleteUserAvatar, getUserInfo, removeAdminStatusFromFamilyMember, setUserAsFamilyAdmin, updateUserDetails } from "./src/triggers/account";
 import { getDinnerDetails, getUserDinnerAttendances, optInForDinner, optOutForDinner, startDinner } from "./src/triggers/dinner";
 import { createJoinCode, joinFamilyUsingCode } from "./src/triggers/families";
 import { createUser, createFamilyAccount, joinFamilyAccountAsAdmin, joinFamilyAccountAsMember } from "./src/triggers/registration";
@@ -17,5 +17,7 @@ module.exports = {
     optOutForDinner,
     getUserDinnerAttendances,
     getDinnerDetails,
-    startDinner
+    startDinner,
+    deleteUserAvatar,
+    updateUserDetails
 };

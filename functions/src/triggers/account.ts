@@ -1,6 +1,6 @@
 import { onRequest, Request } from "firebase-functions/v2/https";
 import { Response } from "express";
-import { isGetReq, isPutReq } from "../utils/request_utils";
+import { isDeleteReq, isGetReq, isPostReq, isPutReq } from "../utils/request_utils";
 import { GENERAL_ERROR_CODE, GENERAL_ERROR_MESSAGE, INVALID_REQUEST_CODE, INVALID_REQUEST_MESSAGE, SUCCESS_CODE, SUCCESS_MESSAGE, UNAUTHORISED_CODE, UNAUTHORISED_MESSAGE } from "../utils/status_codes";
 import { authenticateUserToken } from "../utils/authorisation";
 import { DocumentReference, DocumentSnapshot } from "firebase-admin/firestore";
@@ -8,7 +8,8 @@ import { db } from "../utils/admin";
 import { Family, QueryResponse, QueryResponseExists, User, UserFamily } from "../types/interfaces";
 import QueryStatus from "../types/query_status";
 import { getFamilyMembers, updateUsersAdminStatus } from "../utils/db/families";
-import { getUserData, isUserAdmin, isUserCreator } from "../utils/db/account";
+import { getUserData, isUserAdmin, isUserCreator, updateExistingUserDetails } from "../utils/db/account";
+import { deleteUserAvatarFromStorage } from "../utils/storage/avatars";
 
 const getUserInfo = onRequest(async (req: Request, res: Response): Promise<void> => {
 
@@ -158,8 +159,63 @@ const removeAdminStatusFromFamilyMember = onRequest(async (req: Request, res: Re
     res.status(SUCCESS_CODE).send(SUCCESS_MESSAGE);
 });
 
+const deleteUserAvatar = onRequest(async (req: Request, res: Response): Promise<void> => {
+
+    if (!isDeleteReq(req.method)) {
+        res.status(INVALID_REQUEST_CODE).send(INVALID_REQUEST_MESSAGE);
+        return;
+    }
+
+    const body: any = req.body;
+    const token: string | undefined = req.headers.authorization;
+    const userEmail: string = body.email.toLowerCase();
+    if (!(await authenticateUserToken(token, userEmail))) {
+        res.status(UNAUTHORISED_CODE).send(UNAUTHORISED_MESSAGE);
+        return;
+    }
+
+    const response: boolean = await deleteUserAvatarFromStorage(userEmail);
+    if (!response) {
+        res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
+        return;
+    }
+
+    res.status(SUCCESS_CODE).send(SUCCESS_MESSAGE);
+});
+
+const updateUserDetails = onRequest(async (req: Request, res: Response): Promise<void> => {
+
+    if (!isPostReq(req.method)) {
+        res.status(INVALID_REQUEST_CODE).send(INVALID_REQUEST_MESSAGE);
+        return;
+    }
+
+    const body: any = req.body;
+    const token: string | undefined = req.headers.authorization;
+    const userEmail: string = body.email.toLowerCase();
+    if (!(await authenticateUserToken(token, userEmail))) {
+        res.status(UNAUTHORISED_CODE).send(UNAUTHORISED_MESSAGE);
+        return;
+    }
+
+    const response: boolean = await updateExistingUserDetails(userEmail, {
+        email: userEmail,
+        firstName: body.firstName,
+        lastName: body.lastName
+    });
+
+    if (!response) {
+        res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
+        return;
+    }
+
+    res.status(SUCCESS_CODE).send(SUCCESS_MESSAGE);
+});
+
 export {
     getUserInfo,
     setUserAsFamilyAdmin,
-    removeAdminStatusFromFamilyMember
+    removeAdminStatusFromFamilyMember,
+    deleteUserAvatar,
+    updateUserDetails
 }

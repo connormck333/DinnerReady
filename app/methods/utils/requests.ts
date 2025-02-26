@@ -14,7 +14,7 @@ async function sendPostRequest(endpoint: string, authToken: string, body: any): 
         });
 
         if (response.status != 200) {
-            return { success: false, response: undefined };
+            return { success: false };
         }
 
         let data: any;
@@ -25,8 +25,7 @@ async function sendPostRequest(endpoint: string, authToken: string, body: any): 
         return { success: true, response: data };
 
     } catch (error: any) {
-        console.log(error);
-        return { success: false, response: undefined };
+        return { success: false };
     }
 }
 
@@ -42,7 +41,7 @@ async function sendGetRequest(endpoint: string, authToken: string, params: GetPa
         });
 
         if (response.status != 200) {
-            return { success: false, response: undefined };
+            return { success: false };
         }
 
         let data: any;
@@ -53,8 +52,30 @@ async function sendGetRequest(endpoint: string, authToken: string, params: GetPa
         return { success: true, response: data };
 
     } catch (error: any) {
-        console.log(error);
-        return { success: false, response: undefined };
+        return { success: false };
+    }
+}
+
+async function sendDeleteRequest(endpoint: string, authToken: string, body: any): Promise<Status> {
+    try {
+        const response = await fetch(URL + endpoint, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Authorization': authToken,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body)
+        });
+
+        if (response.status != 200) {
+            return { success: false };
+        }
+
+        return { success: true };
+
+    } catch (error: any) {
+        return { success: false };
     }
 }
 
@@ -69,5 +90,6 @@ function formatParams(params: GetParam[]): string {
 
 export {
     sendPostRequest,
-    sendGetRequest
+    sendGetRequest,
+    sendDeleteRequest
 }

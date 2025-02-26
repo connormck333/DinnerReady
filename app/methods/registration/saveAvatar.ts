@@ -29,7 +29,6 @@ async function saveAvatar(uri: string, location: string): Promise<Status> {
 }
 
 async function saveUserAvatar(uri: string, email: string): Promise<Status> {
-    console.log(email);
     return await saveAvatar(uri, "users/" + email.toLowerCase());
 }
 
