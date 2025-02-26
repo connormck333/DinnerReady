@@ -6,6 +6,7 @@ import Form from '@/components/form/Form';
 import { Status } from '@/methods/utils/interfaces';
 import createNewUser from '@/methods/registration/createUser';
 import { isValidName, isValidPassword } from '@/methods/utils/inputValidation';
+import SafeContainer from '@/components/form/SafeContainer';
 
 export default function CreateAccountScreen(props: any): ReactElement {
 
@@ -45,7 +46,10 @@ export default function CreateAccountScreen(props: any): ReactElement {
     }
 
     return (
-        <View style={styles.container}>
+        <SafeContainer
+            containerStyle={styles.container}
+            backgroundColor='#e9ffe5'
+        >
             <RegistrationHeader />
 
             <Form
@@ -91,13 +95,12 @@ export default function CreateAccountScreen(props: any): ReactElement {
                 />
 
             </Form>
-        </View>
+        </SafeContainer>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         alignItems: 'center',
         backgroundColor: '#e9ffe5'
     }

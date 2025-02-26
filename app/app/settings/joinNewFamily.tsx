@@ -1,5 +1,6 @@
 import Form from "@/components/form/Form";
 import Input from "@/components/form/Input";
+import SafeContainer from "@/components/form/SafeContainer";
 import SharedHeader from "@/components/SharedHeader";
 import UserContext from "@/methods/context/userContext";
 import UserRefreshContext from "@/methods/context/userRefreshContext";
@@ -37,7 +38,10 @@ export default function JoinNewFamilyScreen(props: any): ReactElement {
     }
 
     return (
-        <View style={styles.container}>
+        <SafeContainer
+            containerStyle={styles.container}
+            backgroundColor='#e9ffe5'
+        >
             <SharedHeader
                 buttonColor="rgba(22, 141, 0, 0.3)"
                 goBack={goBack}
@@ -56,13 +60,12 @@ export default function JoinNewFamilyScreen(props: any): ReactElement {
                 />
                 <Text style={styles.info}>By joining a new family account, you will be leaving your current one. All attendance data will be lost.</Text>
             </Form>
-        </View>
+        </SafeContainer>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         alignItems: 'center',
         backgroundColor: '#e9ffe5'
     },

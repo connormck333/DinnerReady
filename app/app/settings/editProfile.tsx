@@ -1,6 +1,7 @@
 import AvatarInput from "@/components/form/Avatar";
 import Form from "@/components/form/Form";
 import Input from "@/components/form/Input";
+import SafeContainer from "@/components/form/SafeContainer";
 import SharedHeader from "@/components/SharedHeader";
 import UserContext from "@/methods/context/userContext";
 import { saveUserAvatar } from "@/methods/registration/saveAvatar";
@@ -62,7 +63,10 @@ export default function EditProfileScreen(props: any): ReactElement {
     }
 
     return (
-        <View style={styles.container}>
+        <SafeContainer
+            containerStyle={styles.container}
+            backgroundColor='#e9ffe5'
+        >
 
             <SharedHeader
                 buttonColor="rgba(22, 141, 0, 0.3)"
@@ -101,13 +105,12 @@ export default function EditProfileScreen(props: any): ReactElement {
                 />
             </Form>
 
-        </View>
+        </SafeContainer>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         alignItems: 'center',
         backgroundColor: '#e9ffe5'
     },

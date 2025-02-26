@@ -1,5 +1,6 @@
 import Form from "@/components/form/Form";
 import Input from "@/components/form/Input";
+import SafeContainer from "@/components/form/SafeContainer";
 import SharedHeader from "@/components/SharedHeader";
 import UserContext from "@/methods/context/userContext";
 import { changePassword } from "@/methods/userManagement/changePassword";
@@ -37,7 +38,10 @@ export default function ChangePasswordScreen(props: any): ReactElement {
     }
 
     return (
-        <View style={styles.container}>
+        <SafeContainer
+            containerStyle={styles.container}
+            backgroundColor='#e9ffe5'
+        >
             <SharedHeader
                 buttonColor="rgba(22, 141, 0, 0.3)"
                 goBack={goBack}
@@ -73,13 +77,12 @@ export default function ChangePasswordScreen(props: any): ReactElement {
                     type="password"
                 />
             </Form>
-        </View>
+        </SafeContainer>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         alignItems: 'center',
         backgroundColor: '#e9ffe5'
     },

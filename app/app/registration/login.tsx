@@ -4,6 +4,7 @@ import Input from '@/components/form/Input';
 import RegistrationHeader from '@/components/registration/RegistrationHeader';
 import Form from '@/components/form/Form';
 import { userLogin } from '@/methods/userManagement/login';
+import SafeContainer from '@/components/form/SafeContainer';
 
 export default function LoginScreen(): ReactElement {
 
@@ -15,7 +16,10 @@ export default function LoginScreen(): ReactElement {
     }
 
     return (
-        <View style={styles.container}>
+        <SafeContainer
+            containerStyle={styles.container}
+            backgroundColor='#e9ffe5'
+        >
             <RegistrationHeader />
 
             <Form
@@ -39,13 +43,12 @@ export default function LoginScreen(): ReactElement {
                     autoComplete="current-password"
                 />
             </Form>
-        </View>
+        </SafeContainer>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         alignItems: 'center',
         backgroundColor: '#e9ffe5'
     }

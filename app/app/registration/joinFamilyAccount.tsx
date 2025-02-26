@@ -1,5 +1,6 @@
 import Form from '@/components/form/Form';
 import Input from '@/components/form/Input';
+import SafeContainer from '@/components/form/SafeContainer';
 import RegistrationHeader from '@/components/registration/RegistrationHeader';
 import UserContext from '@/methods/context/userContext';
 import UserRefreshContext from '@/methods/context/userRefreshContext';
@@ -31,7 +32,10 @@ export default function JoinFamilyAccountScreen(props: any): ReactElement {
     }
 
     return (
-        <View style={styles.container}>
+        <SafeContainer
+            containerStyle={styles.container}
+            backgroundColor='#e9ffe5'
+        >
             <RegistrationHeader />
 
             <Form
@@ -47,13 +51,12 @@ export default function JoinFamilyAccountScreen(props: any): ReactElement {
                 />
 
             </Form>
-        </View>
+        </SafeContainer>
     );
 }
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         alignItems: 'center',
         backgroundColor: '#e9ffe5'
     }
