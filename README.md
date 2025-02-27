@@ -5,6 +5,9 @@ Families create a family account and can plan in advance when they will be in at
 Family admins can send out reminders for members to register their attendance.
 Therefore, whoever is cooking the dinner can know exactly how much to make!
 
+## Preview
+![Home Preview](./preview/home.gif) ![Registration Preview](./preview/registration.gif)
+
 ## Why did I create DinnerReady?
 In my household, there are 5 of us. Regularly, one or more of us will not be in attendance for dinner.
 This has meant that sometimes, too much food has been cooked and goes to waste.
