@@ -7,6 +7,8 @@ import { getFamilyId, getUserData, isUserAdmin } from "../utils/db/account";
 import { Attendee, Dinner, QueryResponse, QueryResponseExists, User } from "../types/interfaces";
 import { createNewDinner, doesDinnerExist, getDinner, getUserAttendanceCalendar, setAnnouncedAtForDinner, setAttendanceForDinnerWithId, setAttendanceForDinnerWithoutId } from "../utils/db/dinner";
 import QueryStatus from "../types/query_status";
+import { getFamilyMembers } from "../utils/db/families";
+import { sendNotification } from "../utils/notifications";
 
 const startDinner = onRequest(async (req: Request, res: Response): Promise<void> => {
 
@@ -64,6 +66,21 @@ const startDinner = onRequest(async (req: Request, res: Response): Promise<void>
     }
 
     // Send notifications
+    const response: QueryResponse = await getFamilyMembers(userData.familyId, undefined);
+    if (response.status === QueryStatus.FAILURE) {
+        res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
+        return;
+    }
+
+    const familyMembers: User[] = response.data;
+    const deviceTokens: (string | undefined)[] = familyMembers.map((member: User): string | undefined => member.deviceToken);
+    const filteredTokens: string[] = deviceTokens.filter((token: string | undefined) => token !== undefined);
+
+    await sendNotification(
+        filteredTokens,
+        "Dinner Reminder",
+        "Please register your attendance for dinner today on the app."
+    );
 
     res.status(SUCCESS_CODE).send(JSON.stringify(queryResponse.data));
 });

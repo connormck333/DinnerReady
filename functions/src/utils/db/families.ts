@@ -71,7 +71,8 @@ async function getFamilyMembers(familyId: string, userId: string | undefined): P
                 firstName: memberUserSnap.data()?.firstName,
                 lastName: memberUserSnap.data()?.surname,
                 familyId: familyId,
-                admin: memberUserSnap.data()?.admin
+                admin: memberUserSnap.data()?.admin,
+                deviceToken: memberUserSnap.data()?.deviceToken
             }
             members.push(memberData);
         }

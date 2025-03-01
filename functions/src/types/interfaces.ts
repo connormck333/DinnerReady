@@ -21,7 +21,8 @@ interface User {
     familyId?: string | undefined,
     email: string | undefined,
     admin?: boolean | undefined,
-    hasCompletedOnboarding?: boolean
+    hasCompletedOnboarding?: boolean,
+    deviceToken?: string
 }
 
 interface QueryResponse {
@@ -52,6 +53,14 @@ interface Attendee {
     attending: boolean | undefined
 }
 
+interface Notification {
+    to: string,
+    sound: string,
+    title: string,
+    body: string,
+    data?: any
+}
+
 export {
     User,
     Family,
@@ -60,5 +69,6 @@ export {
     QueryResponseExists,
     Dinner,
     DinnerStatus,
-    Attendee
+    Attendee,
+    Notification
 }
