@@ -14,6 +14,7 @@ import { getFamilyMembersAvatars } from "@/methods/familyManagement/getFamilyMem
 import { getFocusedRouteNameFromRoute, Route } from "@react-navigation/native";
 import RefreshContext from "@/methods/context/refreshContext";
 import UserRefreshContext from "@/methods/context/userRefreshContext";
+import { saveDeviceToken } from "@/methods/userManagement/saveDeviceToken";
 
 const Tab = createBottomTabNavigator();
 const { width } = Dimensions.get("window");
@@ -32,6 +33,7 @@ export default function TabLayout(): ReactElement {
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
                         await loadUserDetails();
+                        await saveDeviceToken(user.email as string);
                     } else {
                         setSignedIn(false);
                         setSignedInUser(undefined);

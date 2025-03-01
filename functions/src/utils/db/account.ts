@@ -103,11 +103,24 @@ async function getFamilyId(userId: string): Promise<QueryResponse> {
     return { status: QueryStatus.SUCCESS, data: userData.familyId }
 }
 
+async function saveDeviceToken(userId: string, deviceToken: string): Promise<boolean> {
+    try {
+        await db.collection("users").doc(userId).set({
+            deviceToken: deviceToken
+        }, { merge: true });
+    } catch (error) {
+        return false;
+    }
+
+    return true;
+}
+
 export {
     createNewUser,
     getUserData,
     isUserAdmin,
     isUserCreator,
     getFamilyId,
-    updateExistingUserDetails
+    updateExistingUserDetails,
+    saveDeviceToken
 }

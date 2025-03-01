@@ -8,7 +8,7 @@ import { db } from "../utils/admin";
 import { Family, QueryResponse, QueryResponseExists, User, UserFamily } from "../types/interfaces";
 import QueryStatus from "../types/query_status";
 import { getFamilyMembers, updateUsersAdminStatus } from "../utils/db/families";
-import { getUserData, isUserAdmin, isUserCreator, updateExistingUserDetails } from "../utils/db/account";
+import { getUserData, isUserAdmin, isUserCreator, saveDeviceToken, updateExistingUserDetails } from "../utils/db/account";
 import { deleteUserAvatarFromStorage } from "../utils/storage/avatars";
 
 const getUserInfo = onRequest(async (req: Request, res: Response): Promise<void> => {
@@ -212,10 +212,35 @@ const updateUserDetails = onRequest(async (req: Request, res: Response): Promise
     res.status(SUCCESS_CODE).send(SUCCESS_MESSAGE);
 });
 
+const saveUserDeviceToken = onRequest(async (req: Request, res: Response): Promise<void> => {
+
+    if (!isPostReq(req.method)) {
+        res.status(INVALID_REQUEST_CODE).send(INVALID_REQUEST_MESSAGE);
+        return;
+    }
+
+    const body: any = req.body;
+    const token: string | undefined = req.headers.authorization;
+    const userEmail: string = body.email.toLowerCase();
+    if (!(await authenticateUserToken(token, userEmail))) {
+        res.status(UNAUTHORISED_CODE).send(UNAUTHORISED_MESSAGE);
+        return;
+    }
+
+    const response: boolean = await saveDeviceToken(userEmail, body.deviceToken);
+    if (!response) {
+        res.status(GENERAL_ERROR_CODE).send(GENERAL_ERROR_MESSAGE);
+        return;
+    }
+
+    res.status(SUCCESS_CODE).send(SUCCESS_MESSAGE);
+});
+
 export {
     getUserInfo,
     setUserAsFamilyAdmin,
     removeAdminStatusFromFamilyMember,
     deleteUserAvatar,
-    updateUserDetails
+    updateUserDetails,
+    saveUserDeviceToken
 }

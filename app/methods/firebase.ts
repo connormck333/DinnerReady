@@ -1,29 +1,28 @@
 import Constants from "expo-constants";
 import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
 import { FirebaseApp, initializeApp } from "firebase/app";
-// import { getAnalytics } from "firebase/analytics";
 import { initializeAuth, getReactNativePersistence, connectAuthEmulator, Auth } from "firebase/auth";
 import { getStorage, FirebaseStorage, connectStorageEmulator } from "firebase/storage";
 
 let firebaseConfig: any;
-const isProd: boolean = Constants.expoConfig?.extra?.isProd;
+const isProd: boolean = Constants.expoConfig?.extra?.firebase.isProd;
 
 if (isProd) {
     firebaseConfig = {
-        apiKey: Constants.expoConfig?.extra?.apiKey,
-        authDomain: Constants.expoConfig?.extra?.authDomain,
-        projectId: Constants.expoConfig?.extra?.projectId,
-        storageBucket: Constants.expoConfig?.extra?.storageBucket,
-        messagingSenderId: Constants.expoConfig?.extra?.messagingSenderId,
-        appId: Constants.expoConfig?.extra?.appId,
-        measurementId: Constants.expoConfig?.extra?.measurementId
+        apiKey: Constants.expoConfig?.extra?.firebase.apiKey,
+        authDomain: Constants.expoConfig?.extra?.firebase.authDomain,
+        projectId: Constants.expoConfig?.extra?.firebase.projectId,
+        storageBucket: Constants.expoConfig?.extra?.firebase.storageBucket,
+        messagingSenderId: Constants.expoConfig?.extra?.firebase.messagingSenderId,
+        appId: Constants.expoConfig?.extra?.firebase.appId,
+        measurementId: Constants.expoConfig?.extra?.firebase.measurementId
     };
 } else {
     firebaseConfig = {
         apiKey: "test-api-key",
         authDomain: "localhost",
-        projectId: Constants.expoConfig?.extra?.projectId,
-        storageBucket: Constants.expoConfig?.extra?.projectId + ".firebasestorage.app"
+        projectId: Constants.expoConfig?.extra?.firebase.projectId,
+        storageBucket: Constants.expoConfig?.extra?.firebase.projectId + ".firebasestorage.app"
     };
 }
 
@@ -33,13 +32,14 @@ const auth: Auth = initializeAuth(app, {
     persistence: getReactNativePersistence(ReactNativeAsyncStorage)
 });
 const storage: FirebaseStorage = getStorage(app);
+// const messaging: Messaging = getMessaging(app);
 
 if (!isProd) {
-    connectAuthEmulator(auth, "http://127.0.0.1:9099");
-    connectStorageEmulator(storage, "127.0.0.1", 9199);
+    connectAuthEmulator(auth, "http://192.168.0.44:9099");
+    connectStorageEmulator(storage, "192.168.0.44", 9199);
 }
 // const analytics = getAnalytics(app);
 
-const URL: string = isProd ? "" : "http://127.0.0.1:5001/dinner-ready-d541f/us-central1/";
+const URL: string = isProd ? "" : "http://192.168.0.44:5001/dinner-ready-d541f/us-central1/";
 
 export { auth, storage, URL };

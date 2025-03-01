@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "DinnerReady",
-    "slug": "DinnerReady",
+    "slug": "dinnerready",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,13 +9,18 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "usesAppleSignIn": true,
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "bundleIdentifier": "com.connormck.dinnerready"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.connormck.dinnerready",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
